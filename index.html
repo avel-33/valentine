@@ -5,11 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Be My Valentine?</title>
   <style>
-    /* Reset some defaults */
-    * {
-      box-sizing: border-box;
-    }
-
     body {
       margin: 0;
       min-height: 100vh;
@@ -47,7 +42,6 @@
       border-radius: 30px;
       cursor: pointer;
       margin: 10px;
-      position: relative;
       transition: all 0.2s ease;
     }
 
@@ -59,10 +53,6 @@
     .no {
       background-color: #ccc;
       color: #333;
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
     }
 
     .message {
@@ -124,7 +114,7 @@
 <div class="card">
   <h1>Saniya, will you be my Valentine? 💖</h1>
   <button class="yes" onclick="sayYes()">Yes</button>
-  <button class="no" id="noBtn">No</button>
+  <button class="no" onclick="sayNo()">No</button>
   <div class="message" id="message"></div>
 </div>
 
@@ -140,19 +130,10 @@
     }
   }
 
-  // "No" button movement
-  const noBtn = document.getElementById("noBtn");
-
-  function moveNo() {
-    const x = Math.random() * (window.innerWidth - noBtn.offsetWidth);
-    const y = Math.random() * (window.innerHeight - noBtn.offsetHeight);
-    noBtn.style.left = x + "px";
-    noBtn.style.top = y + "px";
-  }
-
-  // Only enable "No" button dodge on wider screens
-  if (window.innerWidth > 500) {
-    noBtn.addEventListener("mouseover", moveNo);
+  // "No" button logic
+  function sayNo() {
+    document.getElementById("message").textContent =
+      "You misclicked! 😅";
   }
 
   // Floating hearts
