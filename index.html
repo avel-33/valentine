@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Be My Valentine?</title>
+  <title>BofA Project</title>
   <style>
     body {
       margin: 0;
@@ -65,7 +65,6 @@
     .valentine {
       font-size: 1.5rem;
       color: #ff4d6d;
-      animation: pulse 2s;
     }
 
     .bounce {
@@ -148,14 +147,14 @@
 <div class="card">
   <div id="introMessage" class="message"></div>
   <div id="secondMessage" class="message" style="display:none;"></div>
-  <div id="valentine" class="valentine" style="display:none;">Saniya, will you be my Valentine? 💖</div>
+  <div id="valentine" class="valentine" style="display:none;">Will you be my Valentine? 💖</div>
   <div id="buttons"></div>
   <div class="message" id="message"></div>
 </div>
 
 <script>
-  const introText = "Hey, I need to ask you something...";
-  const secondText = "For the second year in a row... (Could've been 3 if you were down after I gave you quiz answers)";
+  const introText = "Hey Saniya, I need to ask you something...";
+  const secondText = "For the second year in a row... (Could've been 3 if you were down after I gave you quiz answers)...";
   const introEl = document.getElementById("introMessage");
   const secondEl = document.getElementById("secondMessage");
   const valentineEl = document.getElementById("valentine");
@@ -179,7 +178,6 @@
     typeChar();
   }
 
-  // Start first intro
   typeText(introText, introEl, () => {
     buttonsDiv.innerHTML = `<button class="yes" onclick="startSecond()">Yes?!</button>`;
   });
@@ -198,8 +196,12 @@
     secondEl.style.display = "none";
     valentineEl.style.display = "inline-block";
 
-    valentineEl.classList.add("valentine");
-    setTimeout(() => valentineEl.classList.remove("valentine"), 2000); // pulse for 2s
+    // Wave effect instead of pulse
+    valentineEl.style.animation = "pulse 2s"; // temporarily scale effect
+    setTimeout(() => {
+      valentineEl.style.animation = ""; // remove animation after 2s
+      valentineEl.style.color = "#ff4d6d"; // ensure pink font stays
+    }, 2000);
 
     showButtons();
   }
@@ -274,13 +276,12 @@
         requestAnimationFrame(draw);
       } else {
         ctx.clearRect(0,0,canvas.width,canvas.height);
-        if (callback) setTimeout(callback, 1000); // <-- 1s pause after fireworks
+        if (callback) setTimeout(callback, 1000); // 1s pause after fireworks
       }
     }
     draw();
   }
 
-  // Steps
   const steps = [
     { text: "Activity? 🐶", yesMessage: "Activity Confirmed! 🐾", noMessage: "Try again! 😅" },
     { text: "Dinner? 🍽️", yesMessage: "Dinner Confirmed! 🍽️", noMessage: "Try again! 😅" },
@@ -323,7 +324,6 @@
     }
   }
 
-  // Fireworks on first yes
   const originalNextStep = nextStep;
   nextStep = function(answer) {
     if(stepIndex === -1 && answer === 'yes') {
