@@ -59,6 +59,7 @@
       margin-top: 20px;
       font-size: 1.2rem;
       color: #ff4d6d;
+      min-height: 30px;
     }
 
     /* Floating hearts */
@@ -99,7 +100,6 @@
       z-index: 3;
     }
 
-    /* Responsive tweaks */
     @media (max-width: 500px) {
       h1 { font-size: 1.2rem; }
       button { font-size: 0.9rem; padding: 10px 20px; }
@@ -113,29 +113,14 @@
 
 <div class="card">
   <h1>Saniya, will you be my Valentine? 💖</h1>
-  <button class="yes" onclick="sayYes()">Yes</button>
-  <button class="no" onclick="sayNo()">No</button>
+  <div id="buttons">
+    <button class="yes" onclick="nextStep('yes')">Yes</button>
+    <button class="no" onclick="nextStep('no')">No</button>
+  </div>
   <div class="message" id="message"></div>
 </div>
 
 <script>
-  // "Yes" button logic
-  let confettiStarted = false;
-  function sayYes() {
-    document.getElementById("message").textContent =
-      "Yay! See you on Feb 14th. 💕";
-    if (!confettiStarted) {
-      confettiStarted = true;
-      startConfetti();
-    }
-  }
-
-  // "No" button logic
-  function sayNo() {
-    document.getElementById("message").textContent =
-      "You misclicked! 😅";
-  }
-
   // Floating hearts
   for (let i = 0; i < 20; i++) {
     const heart = document.createElement("div");
@@ -146,9 +131,11 @@
     document.body.appendChild(heart);
   }
 
-  // Confetti 🎉
+  // Confetti setup
   const canvas = document.getElementById("confetti");
   const ctx = canvas.getContext("2d");
+  const confettiPieces = [];
+  let confettiStarted = false;
 
   function resizeCanvas() {
     canvas.width = window.innerWidth;
@@ -156,8 +143,6 @@
   }
   window.addEventListener("resize", resizeCanvas);
   resizeCanvas();
-
-  const confettiPieces = [];
 
   function startConfetti() {
     for (let i = 0; i < 150; i++) {
@@ -183,6 +168,65 @@
       p.y += p.d;
     });
     requestAnimationFrame(drawConfetti);
+  }
+
+  // Step logic
+  const steps = [
+    { text: "Activity? 🐶" },
+    { text: "Dinner? 🍽️" },
+    { text: "Drinks? 🍹" },
+    { text: "Sussy?", yesOnly: true } // last playful step, no emoji in question
+  ];
+  let stepIndex = -1;
+
+  function nextStep(answer) {
+    const messageEl = document.getElementById("message");
+    const buttonsDiv = document.getElementById("buttons");
+
+    if (stepIndex === -1) {
+      // Initial Valentine question
+      if (answer === "yes") {
+        messageEl.textContent = "Yay! See you on Feb 14th. 💕";
+        if (!confettiStarted) {
+          confettiStarted = true;
+          startConfetti();
+        }
+        stepIndex++;
+        setTimeout(showStep, 1000);
+      } else {
+        messageEl.textContent = "You misclicked! 😅";
+      }
+      return;
+    }
+
+    // Move to next step
+    stepIndex++;
+    if (stepIndex < steps.length) {
+      setTimeout(showStep, 500);
+    } else {
+      // Finished all steps
+      messageEl.textContent = "❤️ Can't wait!";
+      buttonsDiv.innerHTML = "";
+    }
+  }
+
+  function showStep() {
+    const buttonsDiv = document.getElementById("buttons");
+    const currentStep = steps[stepIndex];
+    document.getElementById("message").textContent = currentStep.text;
+
+    if (currentStep.yesOnly) {
+      // last playful question: two Yes options, second with wink emoji
+      buttonsDiv.innerHTML = `
+        <button class="yes" onclick="nextStep('yes')">Yes</button>
+        <button class="yes" onclick="nextStep('yes')">😉</button>
+      `;
+    } else {
+      buttonsDiv.innerHTML = `
+        <button class="yes" onclick="nextStep('yes')">Yes</button>
+        <button class="no" onclick="nextStep('no')">No</button>
+      `;
+    }
   }
 </script>
 
