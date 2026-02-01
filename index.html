@@ -125,28 +125,22 @@
   function createHeart() {
     const heart = document.createElement("div");
     heart.className = "heart";
-    heart.style.left = Math.random() * 100 + "vw"; // random horizontal position
-    heart.style.bottom = "-20px"; // start below screen
+    heart.style.left = Math.random() * 100 + "vw";
+    heart.style.bottom = "-20px";
     heart.style.animationDuration = 4 + Math.random() * 4 + "s";
     heart.style.opacity = Math.random() * 0.7 + 0.3;
     document.body.appendChild(heart);
 
-    // Remove after animation ends to prevent DOM bloat
-    setTimeout(() => {
-      heart.remove();
-    }, parseFloat(heart.style.animationDuration) * 1000);
+    setTimeout(() => heart.remove(), parseFloat(heart.style.animationDuration) * 1000);
   }
 
-  // Spawn hearts every 300ms
   setInterval(createHeart, 300);
-  // Spawn initial 10 hearts for immediate effect
   for (let i = 0; i < 10; i++) createHeart();
 
   // Confetti setup
   const canvas = document.getElementById("confetti");
   const ctx = canvas.getContext("2d");
   const confettiPieces = [];
-  let confettiStarted = false;
 
   function resizeCanvas() {
     canvas.width = window.innerWidth;
@@ -155,7 +149,8 @@
   window.addEventListener("resize", resizeCanvas);
   resizeCanvas();
 
-  function startConfetti() {
+  function startConfetti(duration = 3000) {
+    // Create confetti pieces
     for (let i = 0; i < 150; i++) {
       confettiPieces.push({
         x: Math.random() * canvas.width,
@@ -166,32 +161,38 @@
         tilt: Math.random() * 10
       });
     }
-    requestAnimationFrame(drawConfetti);
-  }
 
-  function drawConfetti() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    confettiPieces.forEach(p => {
-      ctx.beginPath();
-      ctx.fillStyle = p.color;
-      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-      ctx.fill();
-      p.y += p.d;
-      // respawn at top when it goes off bottom
-      if (p.y > canvas.height) {
-        p.y = -10;
-        p.x = Math.random() * canvas.width;
+    let startTime = null;
+    function drawConfetti(timestamp) {
+      if (!startTime) startTime = timestamp;
+      const elapsed = timestamp - startTime;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      confettiPieces.forEach(p => {
+        ctx.beginPath();
+        ctx.fillStyle = p.color;
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fill();
+        p.y += p.d;
+        if (p.y > canvas.height) {
+          p.y = -10;
+          p.x = Math.random() * canvas.width;
+        }
+      });
+
+      if (elapsed < duration) {
+        requestAnimationFrame(drawConfetti);
       }
-    });
+    }
     requestAnimationFrame(drawConfetti);
   }
 
   // Step logic
   const steps = [
-    { text: "Activity? 🐶" },
-    { text: "Dinner? 🍽️" },
-    { text: "Drinks? 🍹" },
-    { text: "Sussy?", yesOnly: true } // last playful step, no emoji in question
+    { text: "Activity? 🐶", yesMessage: "Activity Confirmed! 🐾", noMessage: "Try again! 😅" },
+    { text: "Dinner? 🍽️", yesMessage: "Dinner Confirmed! 🍽️", noMessage: "Try again! 😅" },
+    { text: "Drinks? 🍹", yesMessage: "Drinks Confirmed! 🍹", noMessage: "Try again! 😅" },
+    { text: "Sussy?", yesOnly: true }
   ];
   let stepIndex = -1;
 
@@ -200,13 +201,9 @@
     const buttonsDiv = document.getElementById("buttons");
 
     if (stepIndex === -1) {
-      // Initial Valentine question
       if (answer === "yes") {
         messageEl.textContent = "Yay! See you on Feb 14th. 💕";
-        if (!confettiStarted) {
-          confettiStarted = true;
-          startConfetti();
-        }
+        startConfetti(4000); // confetti for ~4 seconds
         stepIndex++;
         setTimeout(showStep, 1000);
       } else {
@@ -215,14 +212,19 @@
       return;
     }
 
-    // Move to next step
+    const currentStep = steps[stepIndex];
+    if (!currentStep.yesOnly) {
+      messageEl.textContent = (answer === "yes") ? currentStep.yesMessage : currentStep.noMessage;
+    }
+
     stepIndex++;
     if (stepIndex < steps.length) {
-      setTimeout(showStep, 500);
+      setTimeout(showStep, 1000);
     } else {
-      // Finished all steps
-      messageEl.textContent = "❤️ Can't wait!";
-      buttonsDiv.innerHTML = "";
+      setTimeout(() => {
+        messageEl.textContent = "❤️ Can't wait!";
+        buttonsDiv.innerHTML = "";
+      }, 1000);
     }
   }
 
@@ -232,7 +234,6 @@
     document.getElementById("message").textContent = currentStep.text;
 
     if (currentStep.yesOnly) {
-      // last playful question: two Yes options, second with wink emoji
       buttonsDiv.innerHTML = `
         <button class="yes" onclick="nextStep('yes')">Yes</button>
         <button class="yes" onclick="nextStep('yes')">😉</button>
