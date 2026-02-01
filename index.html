@@ -130,7 +130,6 @@
     heart.style.animationDuration = 4 + Math.random() * 4 + "s";
     heart.style.opacity = Math.random() * 0.7 + 0.3;
     document.body.appendChild(heart);
-
     setTimeout(() => heart.remove(), parseFloat(heart.style.animationDuration) * 1000);
   }
 
@@ -150,14 +149,14 @@
 
   function startConfetti() {
     const confettiPieces = [];
-    const pieceCount = 200;
+    const pieceCount = 400; // increased number of confetti
 
     for (let i = 0; i < pieceCount; i++) {
       confettiPieces.push({
         x: Math.random() * canvas.width,
-        y: -Math.random() * 50,  // start slightly above screen
+        y: -Math.random() * 50,
         r: Math.random() * 6 + 4,
-        d: Math.random() * 4 + 2, // falling speed
+        d: Math.random() * 3 + 2, // same falling speed as before
         color: `hsl(${Math.random() * 360}, 100%, 70%)`,
         tilt: Math.random() * 10
       });
@@ -182,7 +181,7 @@
       if (stillFalling) {
         requestAnimationFrame(drawConfetti);
       } else {
-        ctx.clearRect(0, 0, canvas.width, canvas.height); // fully remove
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
       }
     }
 
@@ -205,7 +204,7 @@
     if (stepIndex === -1) {
       if (answer === "yes") {
         messageEl.textContent = "Yay! See you on Feb 14th. 💕";
-        startConfetti(); // long, natural falling confetti
+        startConfetti(); // longer confetti with more pieces
         stepIndex++;
         setTimeout(showStep, 1000);
       } else {
