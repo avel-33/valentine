@@ -144,13 +144,13 @@
     function Firework(x, y) {
       this.x = x;
       this.y = y;
-      this.targetY = Math.random() * canvas.height/2 + 50;
+      this.targetY = Math.random() * canvas.height / 2 + 50;
       this.color = `hsl(${Math.random()*360},100%,70%)`;
       this.done = false;
     }
 
     Firework.prototype.update = function() {
-      this.y -= 10;
+      this.y -= 12; // faster ascent
       if (this.y <= this.targetY && !this.done) {
         this.explode();
         this.done = true;
@@ -158,13 +158,14 @@
     }
 
     Firework.prototype.explode = function() {
-      for (let i = 0; i < 30; i++) {
+      const particleCount = 50 + Math.random() * 20; // more sparks
+      for (let i = 0; i < particleCount; i++) {
         particles.push({
           x: this.x,
           y: this.y,
-          vx: Math.cos(Math.random()*2*Math.PI)*4,
-          vy: Math.sin(Math.random()*2*Math.PI)*4,
-          color: this.color,
+          vx: Math.cos(Math.random() * 2 * Math.PI) * (4 + Math.random()*2),
+          vy: Math.sin(Math.random() * 2 * Math.PI) * (4 + Math.random()*2),
+          color: `hsl(${Math.random()*360},100%,${60+Math.random()*20}%)`,
           alpha: 1
         });
       }
@@ -203,9 +204,9 @@
 
     const launchInterval = setInterval(() => {
       if(running) fireworks.push(new Firework(Math.random()*canvas.width, canvas.height));
-    }, 100);
+    }, 80); // launch more frequently
 
-    setTimeout(() => { running=false; clearInterval(launchInterval); }, 1000); // 1 second of fireworks
+    setTimeout(() => { running=false; clearInterval(launchInterval); }, 1000); // 1 second
 
     animate();
   }
@@ -226,7 +227,7 @@
     if(stepIndex===-1) {
       if(answer==="yes") {
         messageEl.textContent="Yay! See you on Feb 14th. 💕";
-        startFireworks(() => { // fireworks done
+        startFireworks(() => { // after fireworks done
           stepIndex++;
           showStep();
         });
