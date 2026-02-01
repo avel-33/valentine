@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BofA Project</title>
+  <title>Be My Valentine?</title>
   <style>
     body {
       margin: 0;
@@ -148,14 +148,14 @@
 <div class="card">
   <div id="introMessage" class="message"></div>
   <div id="secondMessage" class="message" style="display:none;"></div>
-  <div id="valentine" class="valentine" style="display:none;">Will you be my Valentine? 💖</div>
+  <div id="valentine" class="valentine" style="display:none;">Saniya, will you be my Valentine? 💖</div>
   <div id="buttons"></div>
   <div class="message" id="message"></div>
 </div>
 
 <script>
-  const introText = "Hey Saniya, I need to ask you something...";
-  const secondText = "For the second year in a row... (Could've been 3 if you were down after I gave you quiz answers)...";
+  const introText = "Hey, I need to ask you something...";
+  const secondText = "For the second year in a row... (Could've been 3 if you were down after I gave you quiz answers)";
   const introEl = document.getElementById("introMessage");
   const secondEl = document.getElementById("secondMessage");
   const valentineEl = document.getElementById("valentine");
@@ -190,7 +190,7 @@
     secondEl.style.display = "block";
 
     typeText(secondText, secondEl, () => {
-      setTimeout(showValentine, 2000); // pause 2 seconds after quiz text
+      setTimeout(showValentine, 2000); // pause 2s after quiz text
     });
   }
 
@@ -274,7 +274,7 @@
         requestAnimationFrame(draw);
       } else {
         ctx.clearRect(0,0,canvas.width,canvas.height);
-        if (callback) setTimeout(callback, 2000); // 2s pause after fireworks
+        if (callback) setTimeout(callback, 1000); // <-- 1s pause after fireworks
       }
     }
     draw();
@@ -329,7 +329,7 @@
     if(stepIndex === -1 && answer === 'yes') {
       messageEl.textContent = "Yay! See you on Feb 14th. 💕";
       stepIndex++;
-      fireworks(() => showStep()); // 2s pause after fireworks before next step
+      fireworks(() => showStep()); // 1s pause after fireworks
     } else if(stepIndex === -1 && answer === 'no') {
       messageEl.textContent = "You misclicked! 😅";
     } else {
