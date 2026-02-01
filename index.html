@@ -45,15 +45,8 @@
       transition: all 0.2s ease;
     }
 
-    .yes {
-      background-color: #ff4d6d;
-      color: white;
-    }
-
-    .no {
-      background-color: #ccc;
-      color: #333;
-    }
+    .yes { background-color: #ff4d6d; color: white; }
+    .no { background-color: #ccc; color: #333; }
 
     .message {
       margin-top: 20px;
@@ -73,12 +66,10 @@
       z-index: 1;
     }
 
-    .heart::before,
-    .heart::after {
+    .heart::before, .heart::after {
       content: "";
       position: absolute;
-      width: 15px;
-      height: 15px;
+      width: 15px; height: 15px;
       background: #ff4d6d;
       border-radius: 50%;
     }
@@ -109,7 +100,7 @@
 </head>
 <body>
 
-<canvas id="confetti"></canvas>
+<canvas id="fireworks"></canvas>
 
 <div class="card">
   <h1>Saniya, will you be my Valentine? 💖</h1>
@@ -121,7 +112,7 @@
 </div>
 
 <script>
-  // Floating hearts continuously
+  // Floating hearts
   function createHeart() {
     const heart = document.createElement("div");
     heart.className = "heart";
@@ -132,78 +123,94 @@
     document.body.appendChild(heart);
     setTimeout(() => heart.remove(), parseFloat(heart.style.animationDuration) * 1000);
   }
-
   setInterval(createHeart, 300);
   for (let i = 0; i < 10; i++) createHeart();
 
-  // CONFETTI
-  const canvas = document.getElementById("confetti");
+  // FIREWORKS CANVAS
+  const canvas = document.getElementById("fireworks");
   const ctx = canvas.getContext("2d");
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  window.addEventListener("resize", () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  });
 
-  function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-  window.addEventListener("resize", resizeCanvas);
-  resizeCanvas();
+  function startFireworks(callback) {
+    const fireworks = [];
+    const particles = [];
+    let running = true;
 
-  function startConfetti(callback) {
-    const confettiPieces = [];
-
-    // Initial burst
-    for (let i = 0; i < 50; i++) {
-      confettiPieces.push({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height / 2 - 50,
-        r: Math.random() * 8 + 4,
-        d: Math.random() * 3 + 2,
-        color: `hsl(${Math.random() * 360}, 100%, 70%)`,
-        tilt: Math.random() * 10
-      });
+    function Firework(x, y) {
+      this.x = x;
+      this.y = y;
+      this.targetY = Math.random() * canvas.height/2 + 50;
+      this.color = `hsl(${Math.random()*360},100%,70%)`;
+      this.done = false;
     }
 
-    let spawning = true;
-    const spawnInterval = setInterval(() => {
-      if (!spawning) return;
-      for (let i = 0; i < 10; i++) {
-        confettiPieces.push({
-          x: Math.random() * canvas.width,
-          y: -10,
-          r: Math.random() * 8 + 4,
-          d: Math.random() * 3 + 2,
-          color: `hsl(${Math.random() * 360}, 100%, 70%)`,
-          tilt: Math.random() * 10
+    Firework.prototype.update = function() {
+      this.y -= 10;
+      if (this.y <= this.targetY && !this.done) {
+        this.explode();
+        this.done = true;
+      }
+    }
+
+    Firework.prototype.explode = function() {
+      for (let i = 0; i < 30; i++) {
+        particles.push({
+          x: this.x,
+          y: this.y,
+          vx: Math.cos(Math.random()*2*Math.PI)*4,
+          vy: Math.sin(Math.random()*2*Math.PI)*4,
+          color: this.color,
+          alpha: 1
         });
       }
-    }, 100);
-
-    // Stop spawning after 0.5 seconds
-    setTimeout(() => { spawning = false; clearInterval(spawnInterval); }, 500);
-
-    function drawConfetti() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      let stillFalling = false;
-
-      confettiPieces.forEach(p => {
-        if (p.y < canvas.height + 10) {
-          stillFalling = true;
-          ctx.beginPath();
-          ctx.fillStyle = p.color;
-          ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
-          ctx.fill();
-          p.y += p.d;
-          p.x += Math.sin(p.y / 15) * 0.5;
-        }
-      });
-
-      if (stillFalling) requestAnimationFrame(drawConfetti);
-      else {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        if (callback) callback();
-      }
     }
 
-    requestAnimationFrame(drawConfetti);
+    function animate() {
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+
+      for (let f of fireworks) { f.update(); 
+        ctx.beginPath();
+        ctx.arc(f.x, f.y, 3, 0, Math.PI*2);
+        ctx.fillStyle = f.color;
+        ctx.fill();
+      }
+
+      for (let i = particles.length-1; i>=0; i--) {
+        const p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.1; 
+        p.alpha -= 0.02;
+        if(p.alpha <= 0) particles.splice(i,1);
+        else {
+          ctx.globalAlpha = p.alpha;
+          ctx.beginPath();
+          ctx.arc(p.x,p.y,2,0,Math.PI*2);
+          ctx.fillStyle = p.color;
+          ctx.fill();
+          ctx.globalAlpha = 1;
+        }
+      }
+
+      if((running || particles.length) && ctx) requestAnimationFrame(animate);
+      else if(callback) callback();
+    }
+
+    const launchInterval = setInterval(() => {
+      if(running) fireworks.push(new Firework(Math.random()*canvas.width, canvas.height));
+    }, 100);
+
+    setTimeout(() => { running=false; clearInterval(launchInterval); }, 1000); // 1 second of fireworks
+
+    animate();
   }
 
-  // Step logic
+  // Steps
   const steps = [
     { text: "Activity? 🐶", yesMessage: "Activity Confirmed! 🐾", noMessage: "Try again! 😅" },
     { text: "Dinner? 🍽️", yesMessage: "Dinner Confirmed! 🍽️", noMessage: "Try again! 😅" },
@@ -216,27 +223,26 @@
     const messageEl = document.getElementById("message");
     const buttonsDiv = document.getElementById("buttons");
 
-    if (stepIndex === -1) {
-      if (answer === "yes") {
-        messageEl.textContent = "Yay! See you on Feb 14th. 💕";
-        startConfetti(() => {
-          // Show first step after confetti finishes falling
+    if(stepIndex===-1) {
+      if(answer==="yes") {
+        messageEl.textContent="Yay! See you on Feb 14th. 💕";
+        startFireworks(() => { // fireworks done
           stepIndex++;
           showStep();
         });
       } else {
-        messageEl.textContent = "You misclicked! 😅";
+        messageEl.textContent="You misclicked! 😅";
       }
       return;
     }
 
     const currentStep = steps[stepIndex];
-    if (!currentStep.yesOnly) {
-      messageEl.textContent = (answer === "yes") ? currentStep.yesMessage : currentStep.noMessage;
+    if(!currentStep.yesOnly) {
+      messageEl.textContent = (answer==="yes") ? currentStep.yesMessage : currentStep.noMessage;
     }
 
     stepIndex++;
-    if (stepIndex < steps.length) {
+    if(stepIndex < steps.length) {
       setTimeout(showStep, 1000);
     } else {
       setTimeout(() => {
@@ -251,7 +257,7 @@
     const currentStep = steps[stepIndex];
     document.getElementById("message").textContent = currentStep.text;
 
-    if (currentStep.yesOnly) {
+    if(currentStep.yesOnly) {
       buttonsDiv.innerHTML = `
         <button class="yes" onclick="nextStep('yes')">Yes</button>
         <button class="yes" onclick="nextStep('yes')">😉</button>
