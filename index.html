@@ -148,46 +148,41 @@
   window.addEventListener("resize", resizeCanvas);
   resizeCanvas();
 
-  function startConfetti(duration = 3000) {
+  function startConfetti() {
     const confettiPieces = [];
-    const pieceCount = 150;
+    const pieceCount = 200;
 
-    // Create confetti pieces at top of screen
     for (let i = 0; i < pieceCount; i++) {
       confettiPieces.push({
         x: Math.random() * canvas.width,
-        y: -10 - Math.random() * 100, // start slightly above screen
+        y: -Math.random() * 50,  // start slightly above screen
         r: Math.random() * 6 + 4,
-        d: Math.random() * 3 + 2, // falling speed
+        d: Math.random() * 4 + 2, // falling speed
         color: `hsl(${Math.random() * 360}, 100%, 70%)`,
         tilt: Math.random() * 10
       });
     }
 
-    const startTime = Date.now();
-
     function drawConfetti() {
-      const elapsed = Date.now() - startTime;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
+      let stillFalling = false;
 
       confettiPieces.forEach(p => {
-        ctx.beginPath();
-        ctx.fillStyle = p.color;
-        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Update position
-        p.y += p.d;
-
-        // Stop falling at bottom
-        if (p.y > canvas.height) p.y = canvas.height + 10;
+        if (p.y < canvas.height + 10) {
+          stillFalling = true;
+          ctx.beginPath();
+          ctx.fillStyle = p.color;
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fill();
+          p.y += p.d;
+          p.x += Math.sin(p.y / 15) * 0.5; // slight horizontal sway
+        }
       });
 
-      // Stop animation after duration
-      if (elapsed < duration) {
+      if (stillFalling) {
         requestAnimationFrame(drawConfetti);
       } else {
-        ctx.clearRect(0, 0, canvas.width, canvas.height); // remove remaining confetti
+        ctx.clearRect(0, 0, canvas.width, canvas.height); // fully remove
       }
     }
 
@@ -210,7 +205,7 @@
     if (stepIndex === -1) {
       if (answer === "yes") {
         messageEl.textContent = "Yay! See you on Feb 14th. 💕";
-        startConfetti(3000); // run confetti for 3 seconds
+        startConfetti(); // long, natural falling confetti
         stepIndex++;
         setTimeout(showStep, 1000);
       } else {
