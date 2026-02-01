@@ -69,7 +69,7 @@
       height: 15px;
       background: #ff4d6d;
       transform: rotate(45deg);
-      animation: float 6s infinite ease-in;
+      animation: float linear infinite;
       z-index: 1;
     }
 
@@ -87,9 +87,9 @@
     .heart::after { left: -7.5px; top: 0; }
 
     @keyframes float {
-      0% { bottom: -10%; opacity: 0; }
-      50% { opacity: 1; }
-      100% { bottom: 110%; opacity: 0; }
+      0% { transform: translateY(0) rotate(45deg); opacity: 0; }
+      20% { opacity: 1; }
+      100% { transform: translateY(-120vh) rotate(45deg); opacity: 0; }
     }
 
     canvas {
@@ -121,15 +121,25 @@
 </div>
 
 <script>
-  // Floating hearts
-  for (let i = 0; i < 20; i++) {
+  // Floating hearts continuously
+  function createHeart() {
     const heart = document.createElement("div");
     heart.className = "heart";
-    heart.style.left = Math.random() * 100 + "vw";
+    heart.style.left = Math.random() * 100 + "vw"; // random horizontal position
+    heart.style.bottom = "-20px"; // start below screen
     heart.style.animationDuration = 4 + Math.random() * 4 + "s";
-    heart.style.animationDelay = Math.random() * 5 + "s";
+    heart.style.opacity = Math.random() * 0.7 + 0.3;
     document.body.appendChild(heart);
+
+    // Remove after animation ends to prevent DOM bloat
+    setTimeout(() => {
+      heart.remove();
+    }, parseFloat(heart.style.animationDuration) * 1000);
   }
+
+  // Spawn hearts every 300ms
+  setInterval(createHeart, 300);
+  for (let i = 0; i < 10; i++) createHeart();
 
   // Confetti setup
   const canvas = document.getElementById("confetti");
@@ -166,16 +176,20 @@
       ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
       ctx.fill();
       p.y += p.d;
+      if (p.y > canvas.height) {
+        p.y = -10;
+        p.x = Math.random() * canvas.width;
+      }
     });
     requestAnimationFrame(drawConfetti);
   }
 
   // Step logic
   const steps = [
-    { text: "Activity? 🐶" },
-    { text: "Dinner? 🍽️" },
-    { text: "Drinks? 🍹" },
-    { text: "Sussy?", yesOnly: true } // last playful step, no emoji in question
+    { text: "Activity?", yesMessage: "Activity Confirmed! 🐾", noMessage: "Try again! 😅" },
+    { text: "Dinner?", yesMessage: "Dinner Confirmed! 🍽️", noMessage: "Try again! 😅" },
+    { text: "Drinks?", yesMessage: "Drinks Confirmed! 🍹", noMessage: "Try again! 😅" },
+    { text: "Sussy?", yesOnly: true }
   ];
   let stepIndex = -1;
 
@@ -199,14 +213,20 @@
       return;
     }
 
-    // Move to next step
+    const currentStep = steps[stepIndex];
+    if (!currentStep.yesOnly) {
+      messageEl.textContent = (answer === "yes") ? currentStep.yesMessage : currentStep.noMessage;
+    }
+
+    // Move to next step after 1 second
     stepIndex++;
     if (stepIndex < steps.length) {
-      setTimeout(showStep, 500);
+      setTimeout(showStep, 1000);
     } else {
-      // Finished all steps
-      messageEl.textContent = "❤️ Can't wait!";
-      buttonsDiv.innerHTML = "";
+      setTimeout(() => {
+        messageEl.textContent = "❤️ Can't wait!";
+        buttonsDiv.innerHTML = "";
+      }, 1000);
     }
   }
 
@@ -216,7 +236,6 @@
     document.getElementById("message").textContent = currentStep.text;
 
     if (currentStep.yesOnly) {
-      // last playful question: two Yes options, second with wink emoji
       buttonsDiv.innerHTML = `
         <button class="yes" onclick="nextStep('yes')">Yes</button>
         <button class="yes" onclick="nextStep('yes')">😉</button>
