@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BofA Project</title>
+  <title>Be My Valentine?</title>
   <style>
     body {
       margin: 0;
@@ -166,8 +166,6 @@
   const buttonsDiv = document.getElementById("buttons");
   const messageEl = document.getElementById("message");
 
-  let introIndex = 0;
-
   // Typewriter function
   function typeText(text, el, callback) {
     let idx = 0;
@@ -180,7 +178,7 @@
         const cursor = document.createElement("span");
         cursor.className = "cursor";
         el.appendChild(cursor);
-        if (callback) setTimeout(callback, 500);
+        if (callback) setTimeout(callback, 500); // small pause at end of typing
       }
     }
     typeChar();
@@ -195,8 +193,10 @@
     buttonsDiv.innerHTML = "";
     introEl.style.display = "none";
     secondEl.style.display = "block";
+
     typeText(secondText, secondEl, () => {
-      showValentine();
+      // pause for extra 2 seconds before Valentine question
+      setTimeout(showValentine, 2000);
     });
   }
 
@@ -213,7 +213,7 @@
     `;
   }
 
-  // Floating hearts across the screen
+  // Floating hearts
   function createHeart() {
     const heart = document.createElement("div");
     heart.className = "heart";
@@ -284,9 +284,9 @@
 
   // Step logic
   const steps = [
-    { text: "Activity? 🐶", yesMessage: "Activity Confirmed! 🐾", noMessage: "Try again! 😅" },
-    { text: "Dinner? 🍽️", yesMessage: "Dinner Confirmed! 🍽️", noMessage: "Try again! 😅" },
-    { text: "Drinks? 🍹", yesMessage: "Drinks Confirmed! 🍹", noMessage: "Try again! 😅" },
+    { text: "Activity? 🐶", yesMessage: "Activity Confirmed! 🐾", noMessage: "You misclicked! 😅" },
+    { text: "Dinner? 🍽️", yesMessage: "Dinner Confirmed! 🍽️", noMessage: "You misclicked! 😅" },
+    { text: "Drinks? 🍹", yesMessage: "Drinks Confirmed! 🍹", noMessage: "You misclicked! 😅" },
     { text: "Sussy?", yesOnly: true }
   ];
   let stepIndex = -1;
