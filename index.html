@@ -19,25 +19,20 @@
 
     .card {
       background: white;
-      width: 350px;
-      height: 300px; /* fixed height */
+      width: 360px;
+      max-width: 100%;
+      padding: 25px 20px;
       border-radius: 20px;
       text-align: center;
       box-shadow: 0 10px 25px rgba(0,0,0,0.15);
       position: relative;
       z-index: 2;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
     }
 
     h1 {
       color: #ff4d6d;
       margin-bottom: 20px;
       font-size: 1.5rem;
-      display: inline-block;
     }
 
     button {
@@ -46,7 +41,7 @@
       border: none;
       border-radius: 30px;
       cursor: pointer;
-      margin: 5px;
+      margin: 10px;
       transition: all 0.2s ease;
     }
 
@@ -61,15 +56,27 @@
     }
 
     .message {
-      margin-top: 10px;
-      font-size: 1.1rem;
+      margin-top: 20px;
+      font-size: 1.2rem;
       color: #ff4d6d;
       min-height: 30px;
     }
 
+    /* Wave effect */
     .valentine span {
       display: inline-block;
       transition: transform 0.2s;
+    }
+
+    /* Heart bounce animation */
+    .bounce {
+      display: inline-block;
+      animation: bounce 0.6s;
+    }
+
+    @keyframes bounce {
+      0%,100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
     }
 
     /* Floating hearts */
@@ -102,6 +109,20 @@
       100% { transform: translateY(-120vh) rotate(45deg); opacity: 0; }
     }
 
+    /* Blinking cursor for typewriter */
+    .cursor {
+      display: inline-block;
+      width: 2px;
+      background-color: #ff4d6d;
+      margin-left: 2px;
+      animation: blink 0.7s steps(1) infinite;
+    }
+
+    @keyframes blink {
+      0%, 50%, 100% { opacity: 1; }
+      25%, 75% { opacity: 0; }
+    }
+
     canvas {
       position: fixed;
       top: 0;
@@ -111,9 +132,9 @@
     }
 
     @media (max-width: 500px) {
-      .card { width: 90%; height: 300px; padding: 15px; }
-      h1 { font-size: 1.2rem; }
-      button { font-size: 0.9rem; padding: 10px 15px; }
+      .card { width: 90%; padding: 20px; }
+      h1, .valentine { font-size: 1.2rem; }
+      button { font-size: 0.9rem; padding: 10px 18px; }
     }
   </style>
 </head>
@@ -122,22 +143,66 @@
 <canvas id="fireworks"></canvas>
 
 <div class="card">
-  <h1 class="valentine" id="valentine">Saniya, will you be my Valentine? 💖</h1>
-  <div id="buttons">
-    <button class="yes" onclick="handleYes()">Yes</button>
-    <button class="no" onclick="handleNo()">No</button>
-  </div>
+  <div id="introMessage" class="message"></div>
+  <div id="valentine" class="valentine" style="display:none;">Saniya, will you be my Valentine? 💖</div>
+  <div id="buttons"></div>
   <div class="message" id="message"></div>
 </div>
 
 <script>
+  const introText = "Hey, I need to ask you something...";
+  const introEl = document.getElementById("introMessage");
   const valentineEl = document.getElementById("valentine");
   const buttonsDiv = document.getElementById("buttons");
   const messageEl = document.getElementById("message");
-  const fireworksCanvas = document.getElementById("fireworks");
-  const ctx = fireworksCanvas.getContext("2d");
 
-  // --- Floating hearts ---
+  let introIndex = 0;
+
+  // Typewriter intro
+  function typeIntro() {
+    if (introIndex < introText.length) {
+      introEl.textContent += introText[introIndex];
+      introIndex++;
+      setTimeout(typeIntro, 80);
+    } else {
+      const cursor = document.createElement("span");
+      cursor.className = "cursor";
+      introEl.appendChild(cursor);
+
+      buttonsDiv.innerHTML = `<button class="yes" onclick="showValentine()">Yes?!</button>`;
+    }
+  }
+
+  function showValentine() {
+    buttonsDiv.innerHTML = "";
+    introEl.style.display = "none";
+
+    // Wave effect for valentine text
+    valentineEl.style.display = "inline-block";
+    const text = valentineEl.textContent;
+    valentineEl.textContent = "";
+    for (let i = 0; i < text.length; i++) {
+      const span = document.createElement("span");
+      span.textContent = text[i];
+      valentineEl.appendChild(span);
+    }
+    const letters = valentineEl.querySelectorAll("span");
+    letters.forEach((letter, index) => {
+      setTimeout(() => letter.style.transform = "scale(1.4)", index*50);
+    });
+    setTimeout(() => letters.forEach(letter => letter.style.transform="scale(1)"), 2000);
+
+    showButtons();
+  }
+
+  function showButtons() {
+    buttonsDiv.innerHTML = `
+      <button class="yes" onclick="nextStep('yes')">Yes</button>
+      <button class="no" onclick="nextStep('no')">No</button>
+    `;
+  }
+
+  // Floating hearts
   function createHeart() {
     const heart = document.createElement("div");
     heart.className = "heart";
@@ -151,94 +216,92 @@
   setInterval(createHeart, 300);
   for (let i = 0; i < 10; i++) createHeart();
 
-  // --- Fireworks ---
-  function resizeCanvas() {
-    fireworksCanvas.width = window.innerWidth;
-    fireworksCanvas.height = window.innerHeight;
-  }
-  window.addEventListener("resize", resizeCanvas);
-  resizeCanvas();
+  // Fireworks canvas
+  const canvas = document.getElementById("fireworks");
+  const ctx = canvas.getContext("2d");
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  window.addEventListener("resize", () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  });
 
-  function launchFireworks(duration = 1000) {
+  function fireworks() {
     const particles = [];
-    const startTime = Date.now();
-
-    function spawn() {
-      const x = Math.random() * fireworksCanvas.width;
-      const y = Math.random() * fireworksCanvas.height/2;
-      const colors = ["#FF4D6D", "#FFD700", "#00FFFF", "#FF69B4"];
-      for (let i = 0; i < 20; i++) {
-        const angle = Math.random() * 2 * Math.PI;
-        const speed = Math.random() * 5 + 2;
-        particles.push({
-          x, y,
-          dx: Math.cos(angle) * speed,
-          dy: Math.sin(angle) * speed,
-          color: colors[Math.floor(Math.random()*colors.length)],
-          life: 60
-        });
-      }
+    for (let i = 0; i < 120; i++) {
+      particles.push({
+        x: canvas.width/2,
+        y: canvas.height/2,
+        r: Math.random() * 3 + 2,
+        dx: (Math.random() - 0.5) * 6,
+        dy: (Math.random() - 0.5) * 6,
+        color: `hsl(${Math.random()*360},100%,70%)`,
+        alpha: 1
+      });
     }
 
+    const duration = 1000;
+    const start = performance.now();
+
     function draw() {
-      ctx.clearRect(0, 0, fireworksCanvas.width, fireworksCanvas.height);
-      const now = Date.now();
-      if (now - startTime < duration) spawn();
-      particles.forEach((p, i) => {
-        ctx.fillStyle = p.color;
+      const now = performance.now();
+      const elapsed = now - start;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      particles.forEach(p => {
         ctx.beginPath();
-        ctx.arc(p.x, p.y, 3, 0, 2*Math.PI);
+        ctx.fillStyle = p.color;
+        ctx.globalAlpha = p.alpha;
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
         ctx.fill();
         p.x += p.dx;
         p.y += p.dy;
-        p.life--;
-        if (p.life <= 0) particles.splice(i, 1);
+        p.alpha -= 0.02;
       });
-      if (particles.length > 0 || now - startTime < duration) {
+
+      ctx.globalAlpha = 1;
+
+      if (elapsed < duration || particles.some(p => p.alpha > 0)) {
         requestAnimationFrame(draw);
+      } else {
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        showStep();
       }
     }
     draw();
   }
 
-  // --- Valentine wave effect ---
-  function waveEffect(callback) {
-    const text = valentineEl.textContent;
-    valentineEl.textContent = "";
-    for (let i = 0; i < text.length; i++) {
-      const span = document.createElement("span");
-      span.textContent = text[i];
-      valentineEl.appendChild(span);
-    }
-    const letters = valentineEl.querySelectorAll("span");
-    letters.forEach((letter, index) => {
-      setTimeout(() => { letter.style.transform = "scale(1.4)"; }, index*50);
-    });
-    setTimeout(() => {
-      letters.forEach(letter => letter.style.transform = "scale(1)");
-      if(callback) callback();
-    }, 2000); // 2 seconds
-  }
-
-  // --- Steps ---
+  // Step logic
   const steps = [
     { text: "Activity? 🐶", yesMessage: "Activity Confirmed! 🐾", noMessage: "Try again! 😅" },
     { text: "Dinner? 🍽️", yesMessage: "Dinner Confirmed! 🍽️", noMessage: "Try again! 😅" },
     { text: "Drinks? 🍹", yesMessage: "Drinks Confirmed! 🍹", noMessage: "Try again! 😅" },
     { text: "Sussy?", yesOnly: true }
   ];
-  let stepIndex = 0;
+  let stepIndex = -1;
+
+  function nextStep(answer) {
+    const currentStep = steps[stepIndex];
+    if (!currentStep.yesOnly) {
+      messageEl.innerHTML = (answer==="yes") 
+        ? `${currentStep.yesMessage.replace(/(\p{Emoji_Presentation})/gu,'<span class="bounce">$1</span>')}` 
+        : currentStep.noMessage;
+    }
+    stepIndex++;
+    if (stepIndex < steps.length) {
+      setTimeout(showStep, 1000);
+    } else {
+      setTimeout(() => {
+        messageEl.textContent = "❤️ Can't wait!";
+        buttonsDiv.innerHTML = "";
+      }, 1000);
+    }
+  }
 
   function showStep() {
-    if(stepIndex >= steps.length) {
-      messageEl.textContent = "❤️ Can't wait!";
-      buttonsDiv.innerHTML = "";
-      return;
-    }
-    const step = steps[stepIndex];
-    messageEl.textContent = step.text;
-
-    if(step.yesOnly) {
+    const currentStep = steps[stepIndex];
+    messageEl.textContent = currentStep.text;
+    if (currentStep.yesOnly) {
       buttonsDiv.innerHTML = `
         <button class="yes" onclick="nextStep('yes')">Yes</button>
         <button class="yes" onclick="nextStep('yes')">😉</button>
@@ -251,24 +314,23 @@
     }
   }
 
-  function nextStep(answer) {
-    const step = steps[stepIndex];
-    if(!step.yesOnly) {
-      messageEl.textContent = answer === "yes" ? step.yesMessage : step.noMessage;
-    }
-    stepIndex++;
-    setTimeout(showStep, 1000);
-  }
+  // Show intro first
+  typeIntro();
 
-  // --- Handle initial Yes/No ---
-  function handleYes() {
-    messageEl.textContent = "Yay! 💖";
-    launchFireworks(1000); // fireworks for 1 second
-    waveEffect(showStep);
-  }
-  function handleNo() {
-    messageEl.textContent = "You misclicked! 😅";
+  // Show fireworks if first yes pressed
+  const originalNextStep = nextStep;
+  nextStep = function(answer) {
+    if(stepIndex === -1 && answer === 'yes') {
+      messageEl.textContent = "Yay! See you on Feb 14th. 💖";
+      stepIndex++;
+      fireworks();
+    } else if(stepIndex === -1 && answer === 'no') {
+      messageEl.textContent = "You misclicked! 😅";
+    } else {
+      originalNextStep(answer);
+    }
   }
 </script>
+
 </body>
 </html>
