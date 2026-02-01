@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bofa Project</title>
+  <title>BofA Project</title>
   <style>
     body {
       margin: 0;
@@ -29,10 +29,10 @@
       z-index: 2;
     }
 
-    h1, .valentine {
+    h1 {
       color: #ff4d6d;
-      font-size: 1.5rem;
       margin-bottom: 20px;
+      font-size: 1.5rem;
     }
 
     button {
@@ -62,7 +62,16 @@
       min-height: 30px;
     }
 
-    /* Floating hearts */
+    .valentine {
+      font-size: 1.5rem;
+      color: #ff4d6d;
+    }
+
+    .bounce {
+      display: inline-block;
+      animation: bounce 0.6s;
+    }
+
     .heart {
       position: absolute;
       width: 15px;
@@ -86,13 +95,23 @@
     .heart::before { top: -7.5px; left: 0; }
     .heart::after { left: -7.5px; top: 0; }
 
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+
+    @keyframes bounce {
+      0%,100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
     @keyframes float {
       0% { transform: translateY(0) rotate(45deg); opacity: 0; }
       20% { opacity: 1; }
       100% { transform: translateY(-120vh) rotate(45deg); opacity: 0; }
     }
 
-    /* Typewriter cursor */
     .cursor {
       display: inline-block;
       width: 2px;
@@ -104,12 +123,6 @@
     @keyframes blink {
       0%, 50%, 100% { opacity: 1; }
       25%, 75% { opacity: 0; }
-    }
-
-    /* Valentine wave effect */
-    @keyframes wave {
-      0%,100% { transform: translateY(0); }
-      50% { transform: translateY(-10px); }
     }
 
     canvas {
@@ -133,7 +146,7 @@
 
 <div class="card">
   <div id="introMessage" class="message"></div>
-  <div id="intro2" class="message" style="display:none;"></div>
+  <div id="secondMessage" class="message" style="display:none;"></div>
   <div id="valentine" class="valentine" style="display:none;">Will you be my Valentine? 💖</div>
   <div id="buttons"></div>
   <div class="message" id="message"></div>
@@ -141,57 +154,56 @@
 
 <script>
   const introText = "Hey Saniya, I need to ask you something...";
-  const intro2Text = "For the second year in a row... (Could've been 3 if you were down after I gave you quiz answers)";
+  const secondText = "For the second year in a row... (Could've been 3 if you were down after I gave you quiz answers)";
   const introEl = document.getElementById("introMessage");
-  const intro2El = document.getElementById("intro2");
+  const secondEl = document.getElementById("secondMessage");
   const valentineEl = document.getElementById("valentine");
   const buttonsDiv = document.getElementById("buttons");
   const messageEl = document.getElementById("message");
 
-  let introIndex = 0;
-
-  // Typewriter intro
-  function typeText(el, text, callback, speed=80, pauseAfter=false) {
-    let i = 0;
-    function type() {
-      if(i < text.length){
-        el.textContent += text[i];
-        i++;
-        setTimeout(type, speed);
+  function typeText(text, el, callback) {
+    let idx = 0;
+    function typeChar() {
+      if (idx < text.length) {
+        el.textContent += text[idx];
+        idx++;
+        setTimeout(typeChar, 80);
       } else {
-        if(pauseAfter){
-          setTimeout(() => { if(callback) callback(); }, pauseAfter);
-        } else if(callback){
-          callback();
-        }
         const cursor = document.createElement("span");
         cursor.className = "cursor";
         el.appendChild(cursor);
+        if (callback) setTimeout(callback, 500);
       }
     }
-    type();
+    typeChar();
   }
 
-  function showIntro2() {
+  typeText(introText, introEl, () => {
+    buttonsDiv.innerHTML = `<button class="yes" onclick="startSecond()">Yes?!</button>`;
+  });
+
+  function startSecond() {
+    buttonsDiv.innerHTML = "";
     introEl.style.display = "none";
-    intro2El.style.display = "block";
-    typeText(intro2El, intro2Text, showValentine, 50, 2000);
+    secondEl.style.display = "block";
+
+    typeText(secondText, secondEl, () => {
+      setTimeout(showValentine, 2000); // pause 2s after quiz text
+    });
   }
 
   function showValentine() {
-    intro2El.style.display = "none";
+    secondEl.style.display = "none";
     valentineEl.style.display = "inline-block";
-    // Wave effect for 2 seconds
-    const letters = valentineEl.textContent.split("");
-    valentineEl.textContent = "";
-    letters.forEach((letter, idx) => {
-      const span = document.createElement("span");
-      span.textContent = letter;
-      span.style.display = "inline-block";
-      span.style.animation = `wave 2s ease ${idx*0.05}s 1`;
-      valentineEl.appendChild(span);
-    });
-    setTimeout(showButtons, 2000);
+
+    // Wave effect instead of pulse
+    valentineEl.style.animation = "pulse 2s"; // temporarily scale effect
+    setTimeout(() => {
+      valentineEl.style.animation = ""; // remove animation after 2s
+      valentineEl.style.color = "#ff4d6d"; // ensure pink font stays
+    }, 2000);
+
+    showButtons();
   }
 
   function showButtons() {
@@ -205,7 +217,7 @@
   function createHeart() {
     const heart = document.createElement("div");
     heart.className = "heart";
-    heart.style.left = Math.random() * 100 + "vw";
+    heart.style.left = Math.random() * window.innerWidth + "px";
     heart.style.bottom = "-20px";
     heart.style.animationDuration = 4 + Math.random() * 4 + "s";
     heart.style.opacity = Math.random() * 0.7 + 0.3;
@@ -215,7 +227,7 @@
   setInterval(createHeart, 300);
   for (let i = 0; i < 10; i++) createHeart();
 
-  // Fireworks canvas
+  // Fireworks
   const canvas = document.getElementById("fireworks");
   const ctx = canvas.getContext("2d");
   canvas.width = window.innerWidth;
@@ -225,52 +237,51 @@
     canvas.height = window.innerHeight;
   });
 
-  function fireworks(callback){
+  function fireworks(callback) {
     const particles = [];
-    const numParticles = 250;
-    for(let i=0;i<numParticles;i++){
-      const x = Math.random()*canvas.width;
-      const y = Math.random()*canvas.height/2;
-      const angle = Math.random()*2*Math.PI;
-      const speed = Math.random()*8+4;
+    for (let i = 0; i < 120; i++) {
       particles.push({
-        x, y,
-        r: Math.random()*3+2,
-        dx: Math.cos(angle)*speed,
-        dy: Math.sin(angle)*speed,
+        x: canvas.width/2,
+        y: canvas.height/2,
+        r: Math.random() * 3 + 2,
+        dx: (Math.random() - 0.5) * 6,
+        dy: (Math.random() - 0.5) * 6,
         color: `hsl(${Math.random()*360},100%,70%)`,
         alpha: 1
       });
     }
 
-    const duration = 2000; // 2 seconds
+    const duration = 1000;
     const start = performance.now();
 
-    function draw(){
+    function draw() {
       const now = performance.now();
       const elapsed = now - start;
-      ctx.clearRect(0,0,canvas.width,canvas.height);
-      particles.forEach(p=>{
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      particles.forEach(p => {
         ctx.beginPath();
         ctx.fillStyle = p.color;
         ctx.globalAlpha = p.alpha;
-        ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
         ctx.fill();
-        p.x+=p.dx; p.y+=p.dy;
-        p.alpha-=0.015;
+        p.x += p.dx;
+        p.y += p.dy;
+        p.alpha -= 0.02;
       });
-      ctx.globalAlpha=1;
-      if(elapsed<duration || particles.some(p=>p.alpha>0)){
+
+      ctx.globalAlpha = 1;
+
+      if (elapsed < duration || particles.some(p => p.alpha > 0)) {
         requestAnimationFrame(draw);
       } else {
         ctx.clearRect(0,0,canvas.width,canvas.height);
-        if(callback) setTimeout(callback, 1000); // 1s pause after fireworks
+        if (callback) setTimeout(callback, 1000); // 1s pause after fireworks
       }
     }
     draw();
   }
 
-  // Step logic
   const steps = [
     { text: "Activity? 🐶", yesMessage: "Activity Confirmed! 🐾", noMessage: "Try again! 😅" },
     { text: "Dinner? 🍽️", yesMessage: "Dinner Confirmed! 🍽️", noMessage: "Try again! 😅" },
@@ -279,48 +290,47 @@
   ];
   let stepIndex = -1;
 
-  function nextStep(answer){
+  function nextStep(answer) {
     const currentStep = steps[stepIndex];
-    if(!currentStep.yesOnly){
+    if (!currentStep.yesOnly) {
       messageEl.innerHTML = (answer==="yes") 
         ? `${currentStep.yesMessage.replace(/(\p{Emoji_Presentation})/gu,'<span class="bounce">$1</span>')}` 
         : currentStep.noMessage;
     }
     stepIndex++;
-    if(stepIndex<steps.length){
-      setTimeout(showStep,1000);
+    if (stepIndex < steps.length) {
+      setTimeout(showStep, 1000);
     } else {
-      setTimeout(()=>{messageEl.textContent="❤️ Can't wait!"; buttonsDiv.innerHTML="";},1000);
+      setTimeout(() => {
+        messageEl.textContent = "❤️ Can't wait!";
+        buttonsDiv.innerHTML = "";
+      }, 1000);
     }
   }
 
-  function showStep(){
+  function showStep() {
     const currentStep = steps[stepIndex];
     messageEl.textContent = currentStep.text;
-    if(currentStep.yesOnly){
-      buttonsDiv.innerHTML=`
+    if (currentStep.yesOnly) {
+      buttonsDiv.innerHTML = `
         <button class="yes" onclick="nextStep('yes')">Yes</button>
         <button class="yes" onclick="nextStep('yes')">😉</button>
       `;
     } else {
-      buttonsDiv.innerHTML=`
+      buttonsDiv.innerHTML = `
         <button class="yes" onclick="nextStep('yes')">Yes</button>
         <button class="no" onclick="nextStep('no')">No</button>
       `;
     }
   }
 
-  // Show first intro
-  typeText(introEl, introText, showIntro2);
-
-  // Overwrite nextStep for first fireworks
   const originalNextStep = nextStep;
-  nextStep = function(answer){
-    if(stepIndex===-1 && answer==='yes'){
+  nextStep = function(answer) {
+    if(stepIndex === -1 && answer === 'yes') {
       messageEl.textContent = "Yay! See you on Feb 14th. 💕";
       stepIndex++;
-      fireworks(showStep);
-    } else if(stepIndex===-1 && answer==='no'){
+      fireworks(() => showStep()); // 1s pause after fireworks
+    } else if(stepIndex === -1 && answer === 'no') {
       messageEl.textContent = "You misclicked! 😅";
     } else {
       originalNextStep(answer);
