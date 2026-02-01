@@ -62,10 +62,11 @@
       min-height: 30px;
     }
 
+    /* Valentine message with 2s pulse */
     .valentine {
       font-size: 1.5rem;
       color: #ff4d6d;
-      animation: pulse 1s; /* only 1 second */
+      animation: pulse 2s;
     }
 
     /* Heart bounce animation */
@@ -150,6 +151,7 @@
 
 <div class="card">
   <div id="introMessage" class="message"></div>
+  <div id="secondMessage" class="message" style="display:none;"></div>
   <div id="valentine" class="valentine" style="display:none;">Saniya, will you be my Valentine? 💖</div>
   <div id="buttons"></div>
   <div class="message" id="message"></div>
@@ -157,31 +159,49 @@
 
 <script>
   const introText = "Hey, I need to ask you something...";
+  const secondText = "For the second year in a row... (Could've been 3 if you were down after I gave you quiz answers)";
   const introEl = document.getElementById("introMessage");
+  const secondEl = document.getElementById("secondMessage");
   const valentineEl = document.getElementById("valentine");
   const buttonsDiv = document.getElementById("buttons");
   const messageEl = document.getElementById("message");
 
   let introIndex = 0;
 
-  // Typewriter intro
-  function typeIntro() {
-    if (introIndex < introText.length) {
-      introEl.textContent += introText[introIndex];
-      introIndex++;
-      setTimeout(typeIntro, 80);
-    } else {
-      const cursor = document.createElement("span");
-      cursor.className = "cursor";
-      introEl.appendChild(cursor);
-
-      buttonsDiv.innerHTML = `<button class="yes" onclick="showValentine()">Yes?!</button>`;
+  // Typewriter function
+  function typeText(text, el, callback) {
+    let idx = 0;
+    function typeChar() {
+      if (idx < text.length) {
+        el.textContent += text[idx];
+        idx++;
+        setTimeout(typeChar, 80);
+      } else {
+        const cursor = document.createElement("span");
+        cursor.className = "cursor";
+        el.appendChild(cursor);
+        if (callback) setTimeout(callback, 500);
+      }
     }
+    typeChar();
+  }
+
+  // Start first intro
+  typeText(introText, introEl, () => {
+    buttonsDiv.innerHTML = `<button class="yes" onclick="startSecond()">Yes?!</button>`;
+  });
+
+  function startSecond() {
+    buttonsDiv.innerHTML = "";
+    introEl.style.display = "none";
+    secondEl.style.display = "block";
+    typeText(secondText, secondEl, () => {
+      showValentine();
+    });
   }
 
   function showValentine() {
-    buttonsDiv.innerHTML = "";
-    introEl.style.display = "none";
+    secondEl.style.display = "none";
     valentineEl.style.display = "inline-block";
     showButtons();
   }
@@ -193,11 +213,11 @@
     `;
   }
 
-  // Floating hearts
+  // Floating hearts across the screen
   function createHeart() {
     const heart = document.createElement("div");
     heart.className = "heart";
-    heart.style.left = Math.random() * 100 + "vw";
+    heart.style.left = Math.random() * window.innerWidth + "px";
     heart.style.bottom = "-20px";
     heart.style.animationDuration = 4 + Math.random() * 4 + "s";
     heart.style.opacity = Math.random() * 0.7 + 0.3;
@@ -304,9 +324,6 @@
       `;
     }
   }
-
-  // Show intro first
-  typeIntro();
 
   // Show fireworks if first yes pressed
   const originalNextStep = nextStep;
