@@ -62,21 +62,16 @@
       min-height: 30px;
     }
 
-    /* Wave effect */
-    .valentine span {
-      display: inline-block;
-      transition: transform 0.2s;
+    .valentine {
+      font-size: 1.5rem;
+      color: #ff4d6d;
+      animation: pulse 1s; /* only 1 second */
     }
 
     /* Heart bounce animation */
     .bounce {
       display: inline-block;
       animation: bounce 0.6s;
-    }
-
-    @keyframes bounce {
-      0%,100% { transform: translateY(0); }
-      50% { transform: translateY(-10px); }
     }
 
     /* Floating hearts */
@@ -102,6 +97,17 @@
 
     .heart::before { top: -7.5px; left: 0; }
     .heart::after { left: -7.5px; top: 0; }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+
+    @keyframes bounce {
+      0%,100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
 
     @keyframes float {
       0% { transform: translateY(0) rotate(45deg); opacity: 0; }
@@ -176,22 +182,7 @@
   function showValentine() {
     buttonsDiv.innerHTML = "";
     introEl.style.display = "none";
-
-    // Wave effect for valentine text
     valentineEl.style.display = "inline-block";
-    const text = valentineEl.textContent;
-    valentineEl.textContent = "";
-    for (let i = 0; i < text.length; i++) {
-      const span = document.createElement("span");
-      span.textContent = text[i];
-      valentineEl.appendChild(span);
-    }
-    const letters = valentineEl.querySelectorAll("span");
-    letters.forEach((letter, index) => {
-      setTimeout(() => letter.style.transform = "scale(1.4)", index*50);
-    });
-    setTimeout(() => letters.forEach(letter => letter.style.transform="scale(1)"), 2000);
-
     showButtons();
   }
 
@@ -321,7 +312,7 @@
   const originalNextStep = nextStep;
   nextStep = function(answer) {
     if(stepIndex === -1 && answer === 'yes') {
-      messageEl.textContent = "Yay! See you on Feb 14th. 💖";
+      messageEl.textContent = "Yay! See you on Feb 14th. 💕";
       stepIndex++;
       fireworks();
     } else if(stepIndex === -1 && answer === 'no') {
