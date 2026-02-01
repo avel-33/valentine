@@ -136,36 +136,46 @@
   setInterval(createHeart, 300);
   for (let i = 0; i < 10; i++) createHeart();
 
-  // Confetti setup
+  // CONFETTI
   const canvas = document.getElementById("confetti");
   const ctx = canvas.getContext("2d");
 
-  function resizeCanvas() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-  }
+  function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
   window.addEventListener("resize", resizeCanvas);
   resizeCanvas();
 
   function startConfetti() {
     const confettiPieces = [];
+
+    // Spawn a big initial burst so it is visible immediately
+    for (let i = 0; i < 50; i++) {
+      confettiPieces.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height / 2 - 50,
+        r: Math.random() * 8 + 4,
+        d: Math.random() * 4 + 2,
+        color: `hsl(${Math.random() * 360}, 100%, 70%)`,
+        tilt: Math.random() * 10
+      });
+    }
+
     let spawning = true;
     const spawnInterval = setInterval(() => {
       if (!spawning) return;
-      for (let i = 0; i < 8; i++) { // spawn multiple at once
+      for (let i = 0; i < 10; i++) {
         confettiPieces.push({
           x: Math.random() * canvas.width,
           y: -10,
-          r: Math.random() * 6 + 4,
-          d: Math.random() * 3 + 2,
+          r: Math.random() * 8 + 4,
+          d: Math.random() * 4 + 2,
           color: `hsl(${Math.random() * 360}, 100%, 70%)`,
           tilt: Math.random() * 10
         });
       }
-    }, 100); // spawn every 100ms
+    }, 100);
 
-    // Stop spawning after 5 seconds
-    setTimeout(() => { spawning = false; clearInterval(spawnInterval); }, 5000);
+    // Stop spawning after 4 seconds
+    setTimeout(() => { spawning = false; clearInterval(spawnInterval); }, 4000);
 
     function drawConfetti() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -176,18 +186,15 @@
           stillFalling = true;
           ctx.beginPath();
           ctx.fillStyle = p.color;
-          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
           ctx.fill();
           p.y += p.d;
           p.x += Math.sin(p.y / 15) * 0.5;
         }
       });
 
-      if (stillFalling) {
-        requestAnimationFrame(drawConfetti);
-      } else {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-      }
+      if (stillFalling) requestAnimationFrame(drawConfetti);
+      else ctx.clearRect(0, 0, canvas.width, canvas.height);
     }
 
     requestAnimationFrame(drawConfetti);
@@ -209,7 +216,7 @@
     if (stepIndex === -1) {
       if (answer === "yes") {
         messageEl.textContent = "Yay! See you on Feb 14th. 💕";
-        startConfetti(); // confetti falls for 5s then finishes naturally
+        startConfetti();
         stepIndex++;
         setTimeout(showStep, 1000);
       } else {
