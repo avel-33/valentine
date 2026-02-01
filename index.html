@@ -27,6 +27,10 @@
       width: 100%;
       position: relative;
       z-index: 2;
+      min-height: 320px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
     }
 
     #intro, #valentine {
@@ -46,8 +50,8 @@
     }
 
     @keyframes blink {
-      0%, 50%, 100% { opacity: 1; }
-      25%, 75% { opacity: 0; }
+      0%,50%,100% { opacity: 1; }
+      25%,75% { opacity: 0; }
     }
 
     button {
@@ -67,8 +71,32 @@
       margin-top: 20px;
       font-size: 1.2rem;
       color: #ff4d6d;
-      min-height: 30px;
+      min-height: 40px;
     }
+
+    /* Floating hearts */
+    .heart {
+      position: absolute;
+      width: 15px;
+      height: 15px;
+      background: #ff4d6d;
+      transform: rotate(45deg);
+      z-index: 1;
+      opacity: 0.7;
+    }
+
+    .heart::before,
+    .heart::after {
+      content: "";
+      position: absolute;
+      width: 15px;
+      height: 15px;
+      background: #ff4d6d;
+      border-radius: 50%;
+    }
+
+    .heart::before { top: -7.5px; left: 0; }
+    .heart::after { left: -7.5px; top: 0; }
 
     canvas { position: fixed; top:0; left:0; pointer-events:none; z-index:3; }
 
@@ -91,7 +119,33 @@
 </div>
 
 <script>
-  // Fireworks setup
+  // --- Floating hearts ---
+  function createHeart() {
+    const heart = document.createElement("div");
+    heart.className = "heart";
+    heart.style.left = Math.random() * 100 + "vw";
+    heart.style.bottom = "-20px";
+    heart.style.opacity = Math.random() * 0.7 + 0.3;
+    const speed = 2 + Math.random() * 2;
+    document.body.appendChild(heart);
+
+    function moveHeart() {
+      const bottom = parseFloat(heart.style.bottom);
+      if(bottom < window.innerHeight + 20){
+        heart.style.bottom = (bottom + speed) + "px";
+        heart.style.left = parseFloat(heart.style.left) + Math.sin(bottom/20) + "px";
+        requestAnimationFrame(moveHeart);
+      } else {
+        heart.remove();
+      }
+    }
+    moveHeart();
+  }
+
+  setInterval(createHeart, 300);
+  for(let i=0;i<10;i++) createHeart();
+
+  // --- Fireworks setup ---
   const canvas = document.getElementById("fireworks");
   const ctx = canvas.getContext("2d");
   canvas.width = window.innerWidth;
@@ -159,7 +213,7 @@
     animate();
   }
 
-  // Step logic
+  // --- Step logic ---
   const steps = [
     { text: "Activity? 🐶", yesMessage: "Activity Confirmed! 🐾", noMessage: "Try again! 😅" },
     { text: "Dinner? 🍽️", yesMessage: "Dinner Confirmed! 🍽️", noMessage: "Try again! 😅" },
@@ -171,17 +225,24 @@
   function nextStep(answer){
     const messageEl=document.getElementById("message");
     const buttonsDiv=document.getElementById("buttons");
+
     if(stepIndex===-1){
-      messageEl.textContent="Yay! See you on Feb 14th. 💕";
-      startFireworks(()=>{ stepIndex++; showStep(); });
+      if(answer==="yes"){
+        messageEl.textContent = "Yay! See you on Feb 14th. 💖"; 
+        startFireworks(()=>{ stepIndex++; showStep(); });
+      } else {
+        messageEl.textContent = "You misclicked! 😅"; 
+      }
       return;
     }
+
     const currentStep=steps[stepIndex];
     if(!currentStep.yesOnly){
       messageEl.textContent = (answer==="yes") ? currentStep.yesMessage : currentStep.noMessage;
     }
+
     stepIndex++;
-    if(stepIndex < steps.length) setTimeout(showStep,1000);
+    if(stepIndex<steps.length) setTimeout(showStep,1000);
     else setTimeout(()=>{ messageEl.textContent="❤️ Can't wait!"; buttonsDiv.innerHTML=""; },1000);
   }
 
@@ -199,7 +260,7 @@
     }
   }
 
-  // Typewriter for intro
+  // --- Typewriter for intro ---
   const introEl=document.getElementById("intro");
   const valentineEl=document.getElementById("valentine");
   const buttonsDiv=document.getElementById("buttons");
@@ -216,7 +277,7 @@
     }
   }
 
-  // Typewriter for Valentine with blinking cursor
+  // --- Typewriter for Valentine ---
   const valentineText="Saniya, will you be my Valentine? 💖";
   let valCharIndex=0;
   function typeValentine(){
