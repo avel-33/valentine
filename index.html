@@ -144,7 +144,7 @@
   window.addEventListener("resize", resizeCanvas);
   resizeCanvas();
 
-  function startConfetti() {
+  function startConfetti(callback) {
     const confettiPieces = [];
 
     // Initial burst
@@ -153,7 +153,7 @@
         x: Math.random() * canvas.width,
         y: Math.random() * canvas.height / 2 - 50,
         r: Math.random() * 8 + 4,
-        d: Math.random() * 4 + 2,
+        d: Math.random() * 3 + 2,
         color: `hsl(${Math.random() * 360}, 100%, 70%)`,
         tilt: Math.random() * 10
       });
@@ -167,15 +167,15 @@
           x: Math.random() * canvas.width,
           y: -10,
           r: Math.random() * 8 + 4,
-          d: Math.random() * 4 + 2,
+          d: Math.random() * 3 + 2,
           color: `hsl(${Math.random() * 360}, 100%, 70%)`,
           tilt: Math.random() * 10
         });
       }
     }, 100);
 
-    // Stop spawning after 2 seconds
-    setTimeout(() => { spawning = false; clearInterval(spawnInterval); }, 2000);
+    // Stop spawning after 1.5 seconds
+    setTimeout(() => { spawning = false; clearInterval(spawnInterval); }, 1500);
 
     function drawConfetti() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -194,7 +194,10 @@
       });
 
       if (stillFalling) requestAnimationFrame(drawConfetti);
-      else ctx.clearRect(0, 0, canvas.width, canvas.height);
+      else {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        if (callback) callback();
+      }
     }
 
     requestAnimationFrame(drawConfetti);
@@ -216,9 +219,11 @@
     if (stepIndex === -1) {
       if (answer === "yes") {
         messageEl.textContent = "Yay! See you on Feb 14th. 💕";
-        startConfetti(); // confetti falls 2s then existing pieces finish falling
-        stepIndex++;
-        setTimeout(showStep, 1000);
+        startConfetti(() => {
+          // Show first step after confetti is mostly done
+          stepIndex++;
+          showStep();
+        });
       } else {
         messageEl.textContent = "You misclicked! 😅";
       }
