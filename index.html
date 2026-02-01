@@ -1,240 +1,242 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Be My Valentine?</title>
-  <style>
-    body {
-      margin: 0;
-      min-height: 100vh;
-      background: linear-gradient(135deg, #ffb6c1, #ffc0cb);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: 'Comic Sans MS', 'Segoe UI', 'Segoe UI Emoji', 'Apple Color Emoji', 'Noto Color Emoji', sans-serif;
-      overflow: hidden;
-      padding: 20px;
-    }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Be My Valentine?</title>
+<style>
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #ffb6c1, #ffc0cb);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Comic Sans MS', 'Segoe UI', 'Segoe UI Emoji', 'Apple Color Emoji', 'Noto Color Emoji', sans-serif;
+  overflow: hidden;
+  padding: 20px;
+}
 
-    .card {
-      background: white;
-      border-radius: 20px;
-      text-align: center;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-      width: 350px;
-      height: 230px; /* fixed size based on max content */
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
-      position: relative;
-      z-index: 2;
-    }
+.card {
+  background: white;
+  border-radius: 20px;
+  text-align: center;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+  width: 350px;
+  height: 230px; /* fixed box */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  position: relative;
+  z-index: 2;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
 
-    #intro, #valentine {
-      color: #ff4d6d;
-      font-size: 1.2rem;
-      overflow: hidden;
-      text-align: center;
-    }
+.typewriter {
+  color: #ff4d6d;
+  font-size: 1.2rem;
+  overflow: hidden;
+  white-space: normal; /* natural wrapping on mobile */
+  text-align: center;
+  font-family: 'Segoe UI Emoji', 'Apple Color Emoji', 'Noto Color Emoji', sans-serif;
+}
 
-    .cursor {
-      display: inline-block;
-      width: 2px;
-      background-color: #ff4d6d;
-      animation: blink 0.7s infinite;
-      vertical-align: bottom;
-    }
+.cursor {
+  display: inline-block;
+  width: 2px;
+  background-color: #ff4d6d;
+  animation: blink 0.7s infinite;
+  vertical-align: bottom;
+}
 
-    @keyframes blink {
-      0%,50%,100% { opacity: 1; }
-      25%,75% { opacity: 0; }
-    }
+@keyframes blink {
+  0%,50%,100% { opacity: 1; }
+  25%,75% { opacity: 0; }
+}
 
-    button {
-      padding: 10px 20px;
-      font-size: 1rem;
-      border: none;
-      border-radius: 30px;
-      cursor: pointer;
-      margin: 5px;
-      transition: all 0.2s ease;
-    }
+button {
+  padding: 10px 20px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  margin: 5px;
+  transition: all 0.2s ease;
+}
 
-    .yes { background-color: #ff4d6d; color: white; }
-    .no { background-color: #ccc; color: #333; }
+.yes { background-color: #ff4d6d; color: white; }
+.no { background-color: #ccc; color: #333; }
 
-    .message {
-      margin-top: 10px;
-      font-size: 1.1rem;
-      color: #ff4d6d;
-      min-height: 30px;
-      text-align: center;
-    }
+.message {
+  margin-top: 10px;
+  font-size: 1.1rem;
+  color: #ff4d6d;
+  min-height: 30px;
+  text-align: center;
+}
 
-    /* Floating hearts */
-    .heart {
-      position: absolute;
-      width: 15px;
-      height: 15px;
-      background: #ff4d6d;
-      transform: rotate(45deg);
-      z-index: 1;
-      opacity: 0.7;
-    }
+/* Floating hearts */
+.heart {
+  position: absolute;
+  width: 15px;
+  height: 15px;
+  background: #ff4d6d;
+  transform: rotate(45deg);
+  z-index: 1;
+  opacity: 0.7;
+}
+.heart::before,
+.heart::after {
+  content: "";
+  position: absolute;
+  width: 15px;
+  height: 15px;
+  background: #ff4d6d;
+  border-radius: 50%;
+}
+.heart::before { top: -7.5px; left: 0; }
+.heart::after { left: -7.5px; top: 0; }
 
-    .heart::before,
-    .heart::after {
-      content: "";
-      position: absolute;
-      width: 15px;
-      height: 15px;
-      background: #ff4d6d;
-      border-radius: 50%;
-    }
+canvas { position: fixed; top:0; left:0; pointer-events:none; z-index:3; }
 
-    .heart::before { top: -7.5px; left: 0; }
-    .heart::after { left: -7.5px; top: 0; }
-
-    canvas { position: fixed; top:0; left:0; pointer-events:none; z-index:3; }
-
-    @media (max-width:400px){
-      .card { width: 300px; height: 200px; padding:15px; }
-      #intro, #valentine { font-size:1rem; }
-      button { font-size:0.9rem; padding:8px 16px; }
-    }
-  </style>
+@media (max-width:400px){
+  .card { width: 300px; height: 200px; padding:15px; }
+  .typewriter { font-size:1rem; }
+  button { font-size:0.9rem; padding:8px 16px; }
+}
+</style>
 </head>
 <body>
 
 <canvas id="fireworks"></canvas>
 
 <div class="card">
-  <div id="intro"></div>
-  <div id="valentine" style="display:none;"></div>
+  <div id="intro" class="typewriter"></div>
+  <div id="valentine" class="typewriter" style="display:none;"></div>
   <div id="buttons"></div>
   <div class="message" id="message"></div>
 </div>
 
 <script>
-  // --- Floating hearts ---
-  function createHeart() {
-    const heart = document.createElement("div");
-    heart.className = "heart";
-    heart.style.left = Math.random() * 100 + "vw";
-    heart.style.bottom = "-20px";
-    heart.style.opacity = Math.random() * 0.7 + 0.3;
-    const speed = 2 + Math.random()*2;
-    document.body.appendChild(heart);
-    function moveHeart(){
-      const bottom = parseFloat(heart.style.bottom);
-      if(bottom<window.innerHeight+20){
-        heart.style.bottom = (bottom + speed) + "px";
-        heart.style.left = parseFloat(heart.style.left) + Math.sin(bottom/20) + "px";
-        requestAnimationFrame(moveHeart);
-      } else { heart.remove(); }
-    }
-    moveHeart();
+// --- Floating hearts ---
+function createHeart() {
+  const heart = document.createElement("div");
+  heart.className = "heart";
+  heart.style.left = Math.random()*100+"vw";
+  heart.style.bottom="-20px";
+  heart.style.opacity=Math.random()*0.7+0.3;
+  const speed=2+Math.random()*2;
+  document.body.appendChild(heart);
+  function moveHeart(){
+    const bottom=parseFloat(heart.style.bottom);
+    if(bottom<window.innerHeight+20){
+      heart.style.bottom=(bottom+speed)+"px";
+      heart.style.left=parseFloat(heart.style.left)+Math.sin(bottom/20)+"px";
+      requestAnimationFrame(moveHeart);
+    } else heart.remove();
   }
-  setInterval(createHeart,300);
-  for(let i=0;i<10;i++) createHeart();
+  moveHeart();
+}
+setInterval(createHeart,300);
+for(let i=0;i<10;i++) createHeart();
 
-  // --- Fireworks setup ---
-  const canvas = document.getElementById("fireworks");
-  const ctx = canvas.getContext("2d");
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-  window.addEventListener("resize", ()=>{ canvas.width = window.innerWidth; canvas.height = window.innerHeight; });
+// --- Fireworks ---
+const canvas=document.getElementById("fireworks");
+const ctx=canvas.getContext("2d");
+canvas.width=window.innerWidth;
+canvas.height=window.innerHeight;
+window.addEventListener("resize",()=>{canvas.width=window.innerWidth; canvas.height=window.innerHeight;});
 
-  function startFireworks(callback){
-    const fireworks=[]; const particles=[]; let running=true;
-    function Firework(x,y){ this.x=x; this.y=y; this.targetY=Math.random()*canvas.height/2+50; this.color=`hsl(${Math.random()*360},100%,70%)`; this.done=false; }
-    Firework.prototype.update=function(){ this.y-=12; if(this.y<=this.targetY && !this.done){ this.explode(); this.done=true; } }
-    Firework.prototype.explode=function(){ for(let i=0;i<70;i++){ particles.push({x:this.x,y:this.y,vx:Math.cos(Math.random()*2*Math.PI)*(4+Math.random()*2),vy:Math.sin(Math.random()*2*Math.PI)*(4+Math.random()*2),color:`hsl(${Math.random()*360},100%,${60+Math.random()*20}%)`,alpha:1}); } }
-    function animate(){
-      ctx.clearRect(0,0,canvas.width,canvas.height);
-      for(let f of fireworks){ f.update(); ctx.beginPath(); ctx.arc(f.x,f.y,3,0,Math.PI*2); ctx.fillStyle=f.color; ctx.fill(); }
-      for(let i=particles.length-1;i>=0;i--){ const p=particles[i]; p.x+=p.vx; p.y+=p.vy; p.vy+=0.1; p.alpha-=0.02; if(p.alpha<=0) particles.splice(i,1); else{ ctx.globalAlpha=p.alpha; ctx.beginPath(); ctx.arc(p.x,p.y,2,0,Math.PI*2); ctx.fillStyle=p.color; ctx.fill(); ctx.globalAlpha=1; } }
-      if((running || particles.length) && ctx) requestAnimationFrame(animate);
-      else if(callback) callback();
-    }
-    const launchInterval=setInterval(()=>{ if(running) fireworks.push(new Firework(Math.random()*canvas.width,canvas.height)); },60);
-    setTimeout(()=>{ running=false; clearInterval(launchInterval); },1000);
-    animate();
+function startFireworks(callback){
+  const fireworks=[],particles=[]; let running=true;
+  function Firework(x,y){ this.x=x; this.y=y; this.targetY=Math.random()*canvas.height/2+50; this.color=`hsl(${Math.random()*360},100%,70%)`; this.done=false; }
+  Firework.prototype.update=function(){ this.y-=12; if(this.y<=this.targetY&&!this.done){ this.explode(); this.done=true; } }
+  Firework.prototype.explode=function(){ for(let i=0;i<70;i++){ particles.push({x:this.x,y:this.y,vx:Math.cos(Math.random()*2*Math.PI)*(4+Math.random()*2),vy:Math.sin(Math.random()*2*Math.PI)*(4+Math.random()*2),color:`hsl(${Math.random()*360},100%,${60+Math.random()*20}%)`,alpha:1}); } }
+  function animate(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    for(let f of fireworks){ f.update(); ctx.beginPath(); ctx.arc(f.x,f.y,3,0,Math.PI*2); ctx.fillStyle=f.color; ctx.fill(); }
+    for(let i=particles.length-1;i>=0;i--){ const p=particles[i]; p.x+=p.vx; p.y+=p.vy; p.vy+=0.1; p.alpha-=0.02; if(p.alpha<=0) particles.splice(i,1); else{ ctx.globalAlpha=p.alpha; ctx.beginPath(); ctx.arc(p.x,p.y,2,0,Math.PI*2); ctx.fillStyle=p.color; ctx.fill(); ctx.globalAlpha=1; } }
+    if((running||particles.length)&&ctx) requestAnimationFrame(animate);
+    else if(callback) callback();
   }
+  const launchInterval=setInterval(()=>{ if(running) fireworks.push(new Firework(Math.random()*canvas.width,canvas.height)); },60);
+  setTimeout(()=>{ running=false; clearInterval(launchInterval); },1000);
+  animate();
+}
 
-  // --- Steps ---
-  const steps=[
-    { text:"Activity? 🐶", yesMessage:"Activity Confirmed! 🐾", noMessage:"Try again! 😅" },
-    { text:"Dinner? 🍽️", yesMessage:"Dinner Confirmed! 🍽️", noMessage:"Try again! 😅" },
-    { text:"Drinks? 🍹", yesMessage:"Drinks Confirmed! 🍹", noMessage:"Try again! 😅" },
-    { text:"Sussy?", yesOnly:true }
-  ];
-  let stepIndex=-1;
+// --- Steps ---
+const steps=[
+  { text:"Activity? 🐶", yesMessage:"Activity Confirmed! 🐾", noMessage:"Try again! 😅" },
+  { text:"Dinner? 🍽️", yesMessage:"Dinner Confirmed! 🍽️", noMessage:"Try again! 😅" },
+  { text:"Drinks? 🍹", yesMessage:"Drinks Confirmed! 🍹", noMessage:"Try again! 😅" },
+  { text:"Sussy?", yesOnly:true }
+];
+let stepIndex=-1;
 
-  function nextStep(answer){
-    const messageEl=document.getElementById("message");
-    const buttonsDiv=document.getElementById("buttons");
-
-    if(stepIndex===-1){
-      if(answer==="yes"){
-        messageEl.textContent="Yay! See you on Feb 14th. 💖"; 
-        startFireworks(()=>{ stepIndex++; showStep(); });
-      } else { messageEl.textContent="You misclicked! 😅"; }
-      return;
-    }
-
-    const currentStep=steps[stepIndex];
-    if(!currentStep.yesOnly){ messageEl.textContent=(answer==="yes")? currentStep.yesMessage: currentStep.noMessage; }
-
-    stepIndex++;
-    if(stepIndex<steps.length) setTimeout(showStep,1000);
-    else setTimeout(()=>{ messageEl.textContent="❤️ Can't wait!"; buttonsDiv.innerHTML=""; },1000);
-  }
-
-  function showStep(){
-    const buttonsDiv=document.getElementById("buttons");
-    const currentStep=steps[stepIndex];
-    document.getElementById("message").textContent=currentStep.text;
-
-    if(currentStep.yesOnly){
-      buttonsDiv.innerHTML=`<button class="yes" onclick="nextStep('yes')">Yes</button><button class="yes" onclick="nextStep('yes')">😉</button>`;
-    }else{
-      buttonsDiv.innerHTML=`<button class="yes" onclick="nextStep('yes')">Yes</button><button class="no" onclick="nextStep('no')">No</button>`;
-    }
-  }
-
-  // --- Typewriter intro ---
-  const introEl=document.getElementById("intro");
-  const valentineEl=document.getElementById("valentine");
+function nextStep(answer){
+  const messageEl=document.getElementById("message");
   const buttonsDiv=document.getElementById("buttons");
-  const introText="Hey, I need to ask you something...";
-  let charIndex=0;
-  function typeIntro(){
-    if(charIndex<introText.length){
-      introEl.textContent+=introText[charIndex];
-      charIndex++; setTimeout(typeIntro,80);
-    }else{ buttonsDiv.innerHTML=`<button class="yes" onclick="typeValentine()">Yes?!</button>`; }
+
+  if(stepIndex===-1){
+    if(answer==="yes"){
+      messageEl.textContent="Yay! See you on Feb 14th. 💖"; 
+      startFireworks(()=>{ stepIndex++; showStep(); });
+    } else { messageEl.textContent="You misclicked! 😅"; }
+    return;
   }
 
-  // --- Typewriter Valentine ---
-  const valentineText="Saniya, will you be my Valentine? 💖";
-  let valCharIndex=0;
-  function typeValentine(){
-    introEl.style.display="none"; valentineEl.style.display="inline-block"; buttonsDiv.innerHTML="";
-    const cursor=document.createElement("span"); cursor.className="cursor"; valentineEl.appendChild(cursor);
-    function type(){
-      if(valCharIndex<valentineText.length){
-        cursor.insertAdjacentText("beforebegin",valentineText[valCharIndex]);
-        valCharIndex++; setTimeout(type,80);
-      }else{ cursor.remove(); buttonsDiv.innerHTML=`<button class="yes" onclick="nextStep('yes')">Yes</button><button class="no" onclick="nextStep('no')">No</button>`; }
-    }
-    type();
-  }
+  const currentStep=steps[stepIndex];
+  if(!currentStep.yesOnly){ messageEl.textContent=(answer==="yes")? currentStep.yesMessage: currentStep.noMessage; }
 
-  typeIntro();
+  stepIndex++;
+  if(stepIndex<steps.length) setTimeout(showStep,1000);
+  else setTimeout(()=>{ messageEl.textContent="❤️ Can't wait!"; buttonsDiv.innerHTML=""; },1000);
+}
+
+function showStep(){
+  const buttonsDiv=document.getElementById("buttons");
+  const currentStep=steps[stepIndex];
+  document.getElementById("message").textContent=currentStep.text;
+
+  if(currentStep.yesOnly){
+    buttonsDiv.innerHTML=`<button class="yes" onclick="nextStep('yes')">Yes</button><button class="yes" onclick="nextStep('yes')">😉</button>`;
+  }else{
+    buttonsDiv.innerHTML=`<button class="yes" onclick="nextStep('yes')">Yes</button><button class="no" onclick="nextStep('no')">No</button>`;
+  }
+}
+
+// --- Typewriter intro ---
+const introEl=document.getElementById("intro");
+const valentineEl=document.getElementById("valentine");
+const buttonsDiv=document.getElementById("buttons");
+const introText="Hey, I need to ask you something...";
+let charIndex=0;
+function typeIntro(){
+  if(charIndex<introText.length){
+    introEl.innerHTML+=introText[charIndex];
+    charIndex++; setTimeout(typeIntro,80);
+  }else{ buttonsDiv.innerHTML=`<button class="yes" onclick="typeValentine()">Yes?!</button>`; }
+}
+
+// --- Typewriter Valentine ---
+const valentineText="Saniya, will you be my Valentine? 💖";
+let valCharIndex=0;
+function typeValentine(){
+  introEl.style.display="none"; valentineEl.style.display="inline-block"; buttonsDiv.innerHTML="";
+  const cursor=document.createElement("span"); cursor.className="cursor"; valentineEl.appendChild(cursor);
+  function type(){
+    if(valCharIndex<valentineText.length){
+      cursor.insertAdjacentHTML("beforebegin", valentineText[valCharIndex]);
+      valCharIndex++; setTimeout(type,80);
+    }else{ cursor.remove(); buttonsDiv.innerHTML=`<button class="yes" onclick="nextStep('yes')">Yes</button><button class="no" onclick="nextStep('no')">No</button>`; }
+  }
+  type();
+}
+
+typeIntro();
 </script>
 </body>
 </html>
