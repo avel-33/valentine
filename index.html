@@ -147,7 +147,7 @@
   function startConfetti() {
     const confettiPieces = [];
 
-    // Spawn a big initial burst so it is visible immediately
+    // Initial burst
     for (let i = 0; i < 50; i++) {
       confettiPieces.push({
         x: Math.random() * canvas.width,
@@ -174,8 +174,8 @@
       }
     }, 100);
 
-    // Stop spawning after 4 seconds
-    setTimeout(() => { spawning = false; clearInterval(spawnInterval); }, 4000);
+    // Stop spawning after 2 seconds
+    setTimeout(() => { spawning = false; clearInterval(spawnInterval); }, 2000);
 
     function drawConfetti() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -216,7 +216,7 @@
     if (stepIndex === -1) {
       if (answer === "yes") {
         messageEl.textContent = "Yay! See you on Feb 14th. 💕";
-        startConfetti();
+        startConfetti(); // confetti falls 2s then existing pieces finish falling
         stepIndex++;
         setTimeout(showStep, 1000);
       } else {
