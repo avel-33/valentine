@@ -62,20 +62,17 @@
       min-height: 30px;
     }
 
-    /* Valentine message with 2s pulse */
     .valentine {
       font-size: 1.5rem;
       color: #ff4d6d;
       animation: pulse 2s;
     }
 
-    /* Heart bounce animation */
     .bounce {
       display: inline-block;
       animation: bounce 0.6s;
     }
 
-    /* Floating hearts */
     .heart {
       position: absolute;
       width: 15px;
@@ -116,7 +113,6 @@
       100% { transform: translateY(-120vh) rotate(45deg); opacity: 0; }
     }
 
-    /* Blinking cursor for typewriter */
     .cursor {
       display: inline-block;
       width: 2px;
@@ -159,14 +155,13 @@
 
 <script>
   const introText = "Hey Saniya, I need to ask you something...";
-  const secondText = "For the second year in a row... (Could've been 3 if you were down after I gave you quiz answers)";
+  const secondText = "For the second year in a row... (Could've been 3 if you were down after I gave you quiz answers)...";
   const introEl = document.getElementById("introMessage");
   const secondEl = document.getElementById("secondMessage");
   const valentineEl = document.getElementById("valentine");
   const buttonsDiv = document.getElementById("buttons");
   const messageEl = document.getElementById("message");
 
-  // Typewriter function
   function typeText(text, el, callback) {
     let idx = 0;
     function typeChar() {
@@ -178,7 +173,7 @@
         const cursor = document.createElement("span");
         cursor.className = "cursor";
         el.appendChild(cursor);
-        if (callback) setTimeout(callback, 500); // small pause at end of typing
+        if (callback) setTimeout(callback, 500);
       }
     }
     typeChar();
@@ -195,8 +190,7 @@
     secondEl.style.display = "block";
 
     typeText(secondText, secondEl, () => {
-      // pause for extra 2 seconds before Valentine question
-      setTimeout(showValentine, 2000);
+      setTimeout(showValentine, 2000); // pause 2 seconds after quiz text
     });
   }
 
@@ -204,9 +198,8 @@
     secondEl.style.display = "none";
     valentineEl.style.display = "inline-block";
 
-    // Add pulse class for 2s, then remove it
     valentineEl.classList.add("valentine");
-    setTimeout(() => valentineEl.classList.remove("valentine"), 2000);
+    setTimeout(() => valentineEl.classList.remove("valentine"), 2000); // pulse for 2s
 
     showButtons();
   }
@@ -232,7 +225,7 @@
   setInterval(createHeart, 300);
   for (let i = 0; i < 10; i++) createHeart();
 
-  // Fireworks canvas
+  // Fireworks
   const canvas = document.getElementById("fireworks");
   const ctx = canvas.getContext("2d");
   canvas.width = window.innerWidth;
@@ -242,7 +235,7 @@
     canvas.height = window.innerHeight;
   });
 
-  function fireworks() {
+  function fireworks(callback) {
     const particles = [];
     for (let i = 0; i < 120; i++) {
       particles.push({
@@ -281,13 +274,13 @@
         requestAnimationFrame(draw);
       } else {
         ctx.clearRect(0,0,canvas.width,canvas.height);
-        showStep();
+        if (callback) setTimeout(callback, 2000); // 2s pause after fireworks
       }
     }
     draw();
   }
 
-  // Step logic
+  // Steps
   const steps = [
     { text: "Activity? 🐶", yesMessage: "Activity Confirmed! 🐾", noMessage: "Try again! 😅" },
     { text: "Dinner? 🍽️", yesMessage: "Dinner Confirmed! 🍽️", noMessage: "Try again! 😅" },
@@ -330,13 +323,13 @@
     }
   }
 
-  // Show fireworks if first yes pressed
+  // Fireworks on first yes
   const originalNextStep = nextStep;
   nextStep = function(answer) {
     if(stepIndex === -1 && answer === 'yes') {
       messageEl.textContent = "Yay! See you on Feb 14th. 💕";
       stepIndex++;
-      fireworks();
+      fireworks(() => showStep()); // 2s pause after fireworks before next step
     } else if(stepIndex === -1 && answer === 'no') {
       messageEl.textContent = "You misclicked! 😅";
     } else {
