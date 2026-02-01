@@ -33,21 +33,6 @@
       color: #ff4d6d;
       margin-bottom: 20px;
       font-size: 1.5rem;
-      display: inline-block;
-      white-space: pre-wrap;
-    }
-
-    .cursor {
-      display: inline-block;
-      width: 10px;
-      background-color: #ff4d6d;
-      margin-left: 2px;
-      animation: blink 0.7s steps(1) infinite;
-    }
-
-    @keyframes blink {
-      0%, 50% { opacity: 1; }
-      50.1%, 100% { opacity: 0; }
     }
 
     button {
@@ -127,8 +112,8 @@
 <canvas id="confetti"></canvas>
 
 <div class="card">
-  <h1 id="valentineText"><span class="cursor"></span></h1>
-  <div id="buttons" style="display:none;">
+  <h1>Saniya, will you be my Valentine? 💖</h1>
+  <div id="buttons">
     <button class="yes" onclick="nextStep('yes')">Yes</button>
     <button class="no" onclick="nextStep('no')">No</button>
   </div>
@@ -136,26 +121,6 @@
 </div>
 
 <script>
-  // TYPEWRITER EFFECT WITH EMOJI SUPPORT
-  const fullText = "Saniya, will you be my Valentine? 💖";
-  const textEl = document.getElementById("valentineText");
-  const cursor = document.createElement("span");
-  cursor.className = "cursor";
-  textEl.appendChild(cursor);
-
-  const letters = Array.from(fullText); // ensures emojis are handled
-  let i = 0;
-  function typeWriter() {
-    if (i < letters.length) {
-      textEl.insertBefore(document.createTextNode(letters[i]), cursor);
-      i++;
-      setTimeout(typeWriter, 100);
-    } else {
-      document.getElementById("buttons").style.display = "block";
-    }
-  }
-  typeWriter();
-
   // Floating hearts continuously
   function createHeart() {
     const heart = document.createElement("div");
@@ -167,24 +132,27 @@
     document.body.appendChild(heart);
     setTimeout(() => heart.remove(), parseFloat(heart.style.animationDuration) * 1000);
   }
-  setInterval(createHeart, 300);
-  for (let j = 0; j < 10; j++) createHeart();
 
-  // CONFETTI SETUP (falls for 4s, then last pieces finish)
+  setInterval(createHeart, 300);
+  for (let i = 0; i < 10; i++) createHeart();
+
+  // Confetti setup
   const canvas = document.getElementById("confetti");
   const ctx = canvas.getContext("2d");
 
-  function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+  function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
   window.addEventListener("resize", resizeCanvas);
   resizeCanvas();
 
   function startConfetti() {
     const confettiPieces = [];
     let spawning = true;
-
     const spawnInterval = setInterval(() => {
       if (!spawning) return;
-      for (let k = 0; k < 8; k++) {
+      for (let i = 0; i < 8; i++) { // spawn multiple at once
         confettiPieces.push({
           x: Math.random() * canvas.width,
           y: -10,
@@ -194,10 +162,10 @@
           tilt: Math.random() * 10
         });
       }
-    }, 100);
+    }, 100); // spawn every 100ms
 
-    // Stop spawning after 4 seconds
-    setTimeout(() => { spawning = false; clearInterval(spawnInterval); }, 4000);
+    // Stop spawning after 5 seconds
+    setTimeout(() => { spawning = false; clearInterval(spawnInterval); }, 5000);
 
     function drawConfetti() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -208,21 +176,24 @@
           stillFalling = true;
           ctx.beginPath();
           ctx.fillStyle = p.color;
-          ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
           ctx.fill();
           p.y += p.d;
-          p.x += Math.sin(p.y/15)*0.5;
+          p.x += Math.sin(p.y / 15) * 0.5;
         }
       });
 
-      if (stillFalling) requestAnimationFrame(drawConfetti);
-      else ctx.clearRect(0,0,canvas.width,canvas.height);
+      if (stillFalling) {
+        requestAnimationFrame(drawConfetti);
+      } else {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
     }
 
     requestAnimationFrame(drawConfetti);
   }
 
-  // STEP LOGIC
+  // Step logic
   const steps = [
     { text: "Activity? 🐶", yesMessage: "Activity Confirmed! 🐾", noMessage: "Try again! 😅" },
     { text: "Dinner? 🍽️", yesMessage: "Dinner Confirmed! 🍽️", noMessage: "Try again! 😅" },
@@ -238,7 +209,7 @@
     if (stepIndex === -1) {
       if (answer === "yes") {
         messageEl.textContent = "Yay! See you on Feb 14th. 💕";
-        startConfetti();
+        startConfetti(); // confetti falls for 5s then finishes naturally
         stepIndex++;
         setTimeout(showStep, 1000);
       } else {
