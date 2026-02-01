@@ -139,6 +139,7 @@
 
   // Spawn hearts every 300ms
   setInterval(createHeart, 300);
+  // Spawn initial 10 hearts for immediate effect
   for (let i = 0; i < 10; i++) createHeart();
 
   // Confetti setup
@@ -176,6 +177,7 @@
       ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
       ctx.fill();
       p.y += p.d;
+      // respawn at top when it goes off bottom
       if (p.y > canvas.height) {
         p.y = -10;
         p.x = Math.random() * canvas.width;
@@ -186,10 +188,10 @@
 
   // Step logic
   const steps = [
-    { text: "Activity?", yesMessage: "Activity Confirmed! 🐾", noMessage: "Try again! 😅" },
-    { text: "Dinner?", yesMessage: "Dinner Confirmed! 🍽️", noMessage: "Try again! 😅" },
-    { text: "Drinks?", yesMessage: "Drinks Confirmed! 🍹", noMessage: "Try again! 😅" },
-    { text: "Sussy?", yesOnly: true }
+    { text: "Activity? 🐶" },
+    { text: "Dinner? 🍽️" },
+    { text: "Drinks? 🍹" },
+    { text: "Sussy?", yesOnly: true } // last playful step, no emoji in question
   ];
   let stepIndex = -1;
 
@@ -213,20 +215,14 @@
       return;
     }
 
-    const currentStep = steps[stepIndex];
-    if (!currentStep.yesOnly) {
-      messageEl.textContent = (answer === "yes") ? currentStep.yesMessage : currentStep.noMessage;
-    }
-
-    // Move to next step after 1 second
+    // Move to next step
     stepIndex++;
     if (stepIndex < steps.length) {
-      setTimeout(showStep, 1000);
+      setTimeout(showStep, 500);
     } else {
-      setTimeout(() => {
-        messageEl.textContent = "❤️ Can't wait!";
-        buttonsDiv.innerHTML = "";
-      }, 1000);
+      // Finished all steps
+      messageEl.textContent = "❤️ Can't wait!";
+      buttonsDiv.innerHTML = "";
     }
   }
 
@@ -236,6 +232,7 @@
     document.getElementById("message").textContent = currentStep.text;
 
     if (currentStep.yesOnly) {
+      // last playful question: two Yes options, second with wink emoji
       buttonsDiv.innerHTML = `
         <button class="yes" onclick="nextStep('yes')">Yes</button>
         <button class="yes" onclick="nextStep('yes')">😉</button>
