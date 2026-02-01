@@ -136,21 +136,21 @@
 </div>
 
 <script>
-  // TYPEWRITER EFFECT
+  // TYPEWRITER EFFECT WITH EMOJI SUPPORT
   const fullText = "Saniya, will you be my Valentine? 💖";
   const textEl = document.getElementById("valentineText");
   const cursor = document.createElement("span");
   cursor.className = "cursor";
   textEl.appendChild(cursor);
 
+  const letters = Array.from(fullText); // ensures emojis are handled
   let i = 0;
   function typeWriter() {
-    if (i < fullText.length) {
-      textEl.insertBefore(document.createTextNode(fullText[i]), cursor);
+    if (i < letters.length) {
+      textEl.insertBefore(document.createTextNode(letters[i]), cursor);
       i++;
-      setTimeout(typeWriter, 100); // typing speed (ms)
+      setTimeout(typeWriter, 100);
     } else {
-      // show buttons after typing finishes
       document.getElementById("buttons").style.display = "block";
     }
   }
@@ -167,11 +167,10 @@
     document.body.appendChild(heart);
     setTimeout(() => heart.remove(), parseFloat(heart.style.animationDuration) * 1000);
   }
-
   setInterval(createHeart, 300);
   for (let j = 0; j < 10; j++) createHeart();
 
-  // Confetti setup
+  // CONFETTI SETUP (falls for 4s, then last pieces finish)
   const canvas = document.getElementById("confetti");
   const ctx = canvas.getContext("2d");
 
@@ -182,6 +181,7 @@
   function startConfetti() {
     const confettiPieces = [];
     let spawning = true;
+
     const spawnInterval = setInterval(() => {
       if (!spawning) return;
       for (let k = 0; k < 8; k++) {
@@ -196,8 +196,8 @@
       }
     }, 100);
 
-    // stop spawning after 5 seconds
-    setTimeout(() => { spawning = false; clearInterval(spawnInterval); }, 5000);
+    // Stop spawning after 4 seconds
+    setTimeout(() => { spawning = false; clearInterval(spawnInterval); }, 4000);
 
     function drawConfetti() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -222,7 +222,7 @@
     requestAnimationFrame(drawConfetti);
   }
 
-  // Step logic
+  // STEP LOGIC
   const steps = [
     { text: "Activity? 🐶", yesMessage: "Activity Confirmed! 🐾", noMessage: "Try again! 😅" },
     { text: "Dinner? 🍽️", yesMessage: "Dinner Confirmed! 🍽️", noMessage: "Try again! 😅" },
