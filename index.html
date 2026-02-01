@@ -154,7 +154,7 @@
 
 <script>
   const introText = "Hey Saniya, I need to ask you something...";
-  const secondText = "For the second year in a row... (Could've been 3 if you were down after I gave you quiz answers)";
+  const secondText = "For the second year in a row... (Could've been 3 if you were down after I gave you quiz answers)...";
   const introEl = document.getElementById("introMessage");
   const secondEl = document.getElementById("secondMessage");
   const valentineEl = document.getElementById("valentine");
@@ -283,9 +283,9 @@
   }
 
   const steps = [
-    { text: "Activity? 🐶", yesMessage: "Activity Confirmed! 🐾", noMessage: "Try again! 😅" },
-    { text: "Dinner? 🍽️", yesMessage: "Dinner Confirmed! 🍽️", noMessage: "Try again! 😅" },
-    { text: "Drinks? 🍹", yesMessage: "Drinks Confirmed! 🍹", noMessage: "Try again! 😅" },
+    { text: "Activity? 🐶", yesMessage: "Activity Confirmed! 🐾", noMessage: "You misclicked! 😅" },
+    { text: "Dinner? 🍽️", yesMessage: "Dinner Confirmed! 🍽️", noMessage: "You misclicked! 😅" },
+    { text: "Drinks? 🍹", yesMessage: "Drinks Confirmed! 🍹", noMessage: "You misclicked! 😅" },
     { text: "Sussy?", yesOnly: true }
   ];
   let stepIndex = -1;
