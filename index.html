@@ -174,8 +174,8 @@
       }
     }, 100);
 
-    // Stop spawning after 1.5 seconds
-    setTimeout(() => { spawning = false; clearInterval(spawnInterval); }, 1500);
+    // Stop spawning after 0.5 seconds
+    setTimeout(() => { spawning = false; clearInterval(spawnInterval); }, 500);
 
     function drawConfetti() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -220,7 +220,7 @@
       if (answer === "yes") {
         messageEl.textContent = "Yay! See you on Feb 14th. 💕";
         startConfetti(() => {
-          // Show first step after confetti is mostly done
+          // Show first step after confetti finishes falling
           stepIndex++;
           showStep();
         });
